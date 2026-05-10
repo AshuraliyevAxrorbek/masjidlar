@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Masjidlar — Islomiy Ilova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --emerald: #0b5e35;
+  --emerald-m: #137040;
+  --emerald-l: #1d9a5a;
+  --emerald-xl: #27c070;
+  --gold: #c8913a;
+  --gold-l: #e8b85a;
+  --gold-xl: #fcd97a;
+  --bg: #f2ede4;
+  --bg2: #e8e2d6;
+  --card: #fffef9;
+  --border: rgba(11,94,53,0.13);
+  --text: #181a16;
+  --muted: #6b6f65;
+  --light: #aaa89e;
+  --arabic: 'Scheherazade New', serif;
+  --ui: 'Sora', sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --r: 18px;
+  --rs: 12px;
+  --nav: 68px;
+  --hdr: 60px;
+  --shadow: 0 4px 24px rgba(11,94,53,0.10);
+}
+[data-theme="dark"] {
+  --bg: #0e1510;
+  --bg2: #151c12;
+  --card: #1a2218;
+  --border: rgba(29,154,90,0.18);
+  --text: #e8eddf;
+  --muted: #8a9084;
+  --light: #4a5244;
+  --shadow: 0 4px 28px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden;font-family:var(--ui);background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+body{display:flex;flex-direction:column}
+
+/* HEADER */
+.hdr{height:var(--hdr);background:var(--emerald);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;position:relative;z-index:20}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.hdr-title{font-family:var(--serif);color:#fff;font-size:19px;letter-spacing:0.3px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.14);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .2s}
+.icon-btn:active{background:rgba(255,255,255,0.28)}
+
+/* REGION SELECT */
+.region-btn{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:8px;color:#fff;font-family:var(--ui);font-size:12px;font-weight:600;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.region-dropdown{position:absolute;top:calc(var(--hdr) + 4px);right:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:999;min-width:220px;max-height:320px;overflow-y:auto;display:none}
+.region-dropdown.open{display:block}
+.rdd-item{padding:11px 16px;cursor:pointer;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s}
+.rdd-item:last-child{border-bottom:none}
+.rdd-item:active,.rdd-item.sel{background:var(--emerald);color:#fff}
+.rdd-item.sel{font-weight:600}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:none;padding-bottom:calc(var(--nav)+16px)}
+.page.active{display:block}
+
+/* BOTTOM NAV */
+.bnav{height:var(--nav);background:var(--card);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);position:relative;z-index:20;overflow:visible}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--light);cursor:pointer;font-family:var(--ui);font-size:9.5px;font-weight:500;padding:6px 2px;transition:color .2s;position:relative}
+.nitem.active{color:var(--emerald)}
+.nitem svg{width:22px;height:22px}
+.nitem-dot{width:4px;height:4px;border-radius:50%;background:var(--emerald);opacity:0;margin-top:-1px}
+.nitem.active .nitem-dot{opacity:1}
+/* Mosque center button */
+.nitem-masjid{flex:0 0 72px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border:none;background:none;cursor:pointer;position:relative;top:-8px}
+.nitem-masjid-circle{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--emerald-m),var(--emerald-l));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(11,94,53,0.4);border:3px solid var(--bg);transition:transform .2s}
+.nitem-masjid-circle:active{transform:scale(0.92)}
+.nitem-masjid span{font-size:9.5px;color:var(--emerald);font-weight:600;margin-top:4px}
+
+/* SECTION TITLE */
+.stitle{font-family:var(--serif);font-size:17px;color:var(--emerald);padding:16px 16px 6px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin:10px 14px;box-shadow:var(--shadow)}
+
+/* ====== HOME ====== */
+.hero{background:linear-gradient(160deg,#083525 0%,#0b5e35 50%,#137040 100%);padding:22px 16px 18px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-40px;right:-30px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none}
+.hero::before{content:'';position:absolute;bottom:-20px;left:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.03);pointer-events:none}
+.hero-greeting{color:rgba(255,255,255,0.65);font-size:12px;margin-bottom:4px;letter-spacing:0.5px}
+.hero-time{font-family:var(--serif);color:#fff;font-size:44px;letter-spacing:-1px;line-height:1}
+.hero-date{color:rgba(255,255,255,0.7);font-size:12px;margin-top:4px}
+.hero-hijri{font-family:var(--arabic);font-size:16px;color:var(--gold-xl);margin-top:3px}
+.hero-region{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border-radius:20px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.85);margin-top:8px;cursor:pointer}
+
+/* PRAYER STRIP */
+.pstrip{display:flex;gap:8px;padding:12px 12px 4px;overflow-x:auto;scrollbar-width:none}
+.pstrip::-webkit-scrollbar{display:none}
+.ppill{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 13px;text-align:center;min-width:78px;transition:all .2s}
+.ppill.next-prayer{background:linear-gradient(135deg,var(--gold),var(--gold-l));border-color:transparent}
+.ppill.next-prayer .ppname{color:rgba(255,255,255,0.85)}
+.ppill.next-prayer .pptime{color:#fff}
+.ppill.passed{opacity:0.4}
+.ppname{font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px}
+.pptime{font-family:var(--serif);font-size:16px;color:var(--text)}
+
+/* COUNTDOWN */
+.cd-card{text-align:center;padding:20px}
+.cd-label{font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.cd-val{font-family:var(--serif);font-size:36px;color:var(--emerald);letter-spacing:2px}
+.cd-name{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* QUICK LINKS */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 14px 14px}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.qcard:active{transform:scale(0.96);box-shadow:none}
+.qcard-icon{font-size:30px;margin-bottom:8px}
+.qcard-label{font-size:13px;font-weight:600;color:var(--emerald)}
+
+/* ====== MOSQUE MAP ====== */
+.map-container{overflow:hidden;background:var(--bg2);position:relative}
+#map{width:100%;height:100%}
+.map-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--muted);font-size:14px}
+.loc-btn{width:calc(100%-28px);margin:0 14px;padding:14px;background:var(--emerald);color:#fff;border:none;border-radius:12px;font-family:var(--ui);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.loc-btn:active{opacity:0.8}
+.mlist-card{margin:10px 14px}
+.mitem{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.mitem:last-child{border-bottom:none}
+.mitem:active{background:var(--bg2)}
+.mitem-icon{width:42px;height:42px;border-radius:12px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.mitem-info{flex:1}
+.mitem-name{font-weight:600;font-size:14px;color:var(--text)}
+.mitem-addr{font-size:11px;color:var(--muted);margin-top:2px}
+.mitem-dist{font-size:13px;font-weight:700;color:var(--emerald);flex-shrink:0}
+.msearch{margin:10px 14px;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.msearch input{flex:1;border:none;background:none;color:var(--text);font-family:var(--ui);font-size:15px;outline:none}
+.msearch input::placeholder{color:var(--light)}
+
+/* MOSQUE MODAL */
+.mmodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;display:none;align-items:flex-end}
+.mmodal-overlay.open{display:flex}
+.mmodal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:75vh;overflow-y:auto}
+.mmodal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.mmodal-name{font-family:var(--serif);font-size:20px;color:var(--text);margin-bottom:6px}
+.mmodal-addr{font-size:13px;color:var(--muted);margin-bottom:16px}
+.mmodal-btns{display:flex;gap:10px}
+.mmodal-btn{flex:1;padding:13px;border-radius:12px;border:none;font-family:var(--ui);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.mmodal-btn.primary{background:var(--emerald);color:#fff}
+.mmodal-btn.secondary{background:var(--bg2);color:var(--text)}
+
+/* ====== QURAN ====== */
+.qtabs{display:flex;margin:10px 14px;background:var(--bg2);border-radius:12px;padding:4px;gap:0}
+.qtab{flex:1;padding:8px;border:none;background:none;border-radius:9px;font-family:var(--ui);font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .2s}
+.qtab.active{background:var(--card);color:var(--emerald);font-weight:600;box-shadow:0 1px 6px rgba(0,0,0,0.08)}
+.reciter-wrap{margin:0 14px 8px}
+.reciter-wrap select{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-family:var(--ui);font-size:13px;outline:none;cursor:pointer}
+.slist{margin:0 14px}
+.srow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .2s}
+.srow:active{opacity:0.7}
+.srow:last-child{border-bottom:none}
+.snum{width:36px;height:36px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--emerald);flex-shrink:0}
+.sinfo{flex:1}
+.sname{font-weight:600;font-size:14px;color:var(--text)}
+.smeta{font-size:11px;color:var(--muted);margin-top:2px}
+.sarabic{font-family:var(--arabic);font-size:18px;color:var(--emerald)}
+.fav-btn{padding:4px;background:none;border:none;cursor:pointer;color:var(--light);font-size:18px}
+.fav-btn.on{color:var(--gold)}
+
+/* READER */
+.reader{display:none;position:absolute;inset:0;background:var(--bg);z-index:50;overflow-y:auto;padding-bottom:120px}
+.reader.open{display:block}
+.reader-hdr{position:sticky;top:0;background:var(--emerald);padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:5}
+.reader-back{background:rgba(255,255,255,0.18);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:18px;flex-shrink:0}
+.reader-titles{flex:1}
+.reader-name{color:#fff;font-family:var(--serif);font-size:17px}
+.reader-sub{color:rgba(255,255,255,0.7);font-size:11px;margin-top:1px}
+.reader-play-btn{background:var(--gold);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0}
+.bismillah{text-align:center;padding:22px 16px 10px;font-family:var(--arabic);font-size:30px;color:var(--emerald)}
+.ayah-row{padding:14px 16px;border-bottom:1px solid var(--border)}
+.ayah-row.highlighted{background:rgba(11,94,53,0.06)}
+.ayah-arabic{font-family:var(--arabic);font-size:26px;line-height:1.9;text-align:right;direction:rtl;color:var(--text);margin-bottom:8px}
+.ayah-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--emerald);color:#fff;border-radius:50%;width:22px;height:22px;font-size:10px;margin-right:6px;vertical-align:middle}
+.ayah-tr{font-size:13px;color:var(--muted);line-height:1.65}
+.ayah-acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.aact{padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:none;font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;font-family:var(--ui);transition:background .15s}
+.aact:active{background:var(--bg2)}
+
+/* AUDIO PLAYER */
+.aplayer{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.12);display:none}
+.apl-info{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.apl-thumb{width:38px;height:38px;border-radius:10px;background:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:16px}
+.apl-meta{flex:1}
+.apl-surah{font-weight:600;font-size:13px;color:var(--text)}
+.apl-rec{font-size:11px;color:var(--muted)}
+.apl-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:2px}
+.apl-ctrls{display:flex;align-items:center;gap:10px}
+.apl-btn{background:none;border:none;cursor:pointer;color:var(--text);font-size:20px;padding:4px}
+.apl-play{background:var(--emerald);color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:15px;border:none;cursor:pointer;flex-shrink:0}
+.apl-prog{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg2);outline:none;cursor:pointer}
+.apl-prog::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--emerald)}
+.apl-time{font-size:11px;color:var(--muted);min-width:36px;text-align:right}
+
+/* BOOKMARKS */
+.bm-section{margin:0 14px}
+.bm-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.bm-row:last-child{border-bottom:none}
+.bm-info{flex:1}
+.bm-name{font-size:14px;font-weight:600;color:var(--text)}
+.bm-sub{font-family:var(--arabic);font-size:15px;color:var(--muted);direction:rtl}
+.bm-del{background:none;border:none;color:var(--light);cursor:pointer;font-size:18px;padding:4px}
+
+/* ====== TASBEH ====== */
+.tasbeh-page{display:flex;flex-direction:column;align-items:center;padding:16px 16px}
+.tasbeh-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.tchip{padding:7px 14px;border:1px solid var(--border);border-radius:20px;background:var(--card);font-size:12px;cursor:pointer;color:var(--muted);font-family:var(--ui);transition:all .2s}
+.tchip.active{background:var(--emerald);color:#fff;border-color:transparent}
+.tarabic{font-family:var(--arabic);font-size:24px;color:var(--emerald);text-align:center;margin-bottom:4px}
+.tuz{font-size:13px;color:var(--muted);text-align:center;margin-bottom:22px}
+.tasbeh-ring-wrap{position:relative;margin-bottom:24px}
+.t-ring{width:220px;height:220px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);position:relative;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.t-ring-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.t-ring-svg circle.track{fill:none;stroke:var(--bg2);stroke-width:10}
+.t-ring-svg circle.prog{fill:none;stroke:var(--emerald);stroke-width:10;stroke-linecap:round;stroke-dasharray:628;stroke-dashoffset:628;transition:stroke-dashoffset .2s}
+.t-num{font-family:var(--serif);font-size:68px;color:var(--text);user-select:none}
+.t-target{font-size:12px;color:var(--muted)}
+.t-sets{font-size:12px;color:var(--muted);margin-bottom:16px}
+.tbtn{width:160px;height:160px;border-radius:50%;border:none;background:linear-gradient(145deg,var(--emerald-m),var(--emerald-l));color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 8px 32px rgba(11,94,53,0.38);transition:transform .1s,box-shadow .1s;-webkit-user-select:none;user-select:none}
+.tbtn:active{transform:scale(0.93);box-shadow:0 2px 12px rgba(11,94,53,0.3)}
+.tbtn-icon{font-size:36px}
+.tbtn-label{font-size:14px;font-weight:600;letter-spacing:0.3px}
+.t-reset{margin-top:14px;padding:10px 24px;border:1px solid var(--border);border-radius:10px;background:none;color:var(--muted);font-family:var(--ui);font-size:13px;cursor:pointer}
+
+/* ====== QIBLA ====== */
+.qibla-page{display:flex;flex-direction:column;align-items:center;padding:20px 16px}
+.qibla-icon{font-size:40px;margin-bottom:10px}
+.qibla-title{font-family:var(--serif);font-size:22px;color:var(--emerald);margin-bottom:16px}
+.compass-outer{width:260px;height:260px;border-radius:50%;background:var(--card);border:2px solid var(--border);box-shadow:var(--shadow);position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.compass-rose{position:absolute;inset:20px;border-radius:50%;border:1px dashed var(--border)}
+.cdir{position:absolute;font-size:13px;font-weight:700;transform:translate(-50%,-50%)}
+.cdir.cn{top:18px;left:50%;color:var(--emerald)}
+.cdir.cs{bottom:8px;left:50%;transform:translate(-50%,50%)}
+.cdir.ce{right:12px;top:50%;transform:translate(50%,-50%)}
+.cdir.cw{left:12px;top:50%;transform:translate(-50%,-50%)}
+/* Compass ticks */
+.compass-ticks{position:absolute;inset:0;border-radius:50%}
+.qneedle-wrap{position:absolute;top:50%;left:50%;width:8px;transform:translate(-50%,-100%);transform-origin:bottom center;transition:transform 0.4s cubic-bezier(.25,.46,.45,.94)}
+.qneedle{width:4px;height:108px;border-radius:3px 3px 0 0;background:linear-gradient(to bottom,var(--gold) 0%,var(--gold) 50%,var(--emerald) 50%);margin:0 auto}
+.qcenter{width:14px;height:14px;border-radius:50%;background:var(--emerald);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;border:2px solid var(--card)}
+.qibla-deg{font-family:var(--serif);font-size:30px;color:var(--emerald)}
+.qibla-label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.qibla-status{font-size:13px;color:var(--muted);text-align:center;padding:0 20px;margin-bottom:16px;min-height:36px}
+.qibla-acc{font-size:11px;color:var(--light);text-align:center;margin-bottom:12px}
+
+/* CALIBRATE ring animation */
+@keyframes calibrate{0%,100%{transform:rotate(0deg)}25%{transform:rotate(90deg)}50%{transform:rotate(180deg)}75%{transform:rotate(270deg)}}
+.calibrating .compass-outer{animation:calibrate 3s linear infinite}
+
+/* ====== DUAS ====== */
+.dua-cats{display:flex;gap:8px;padding:0 14px;overflow-x:auto;scrollbar-width:none;margin-bottom:4px}
+.dua-cats::-webkit-scrollbar{display:none}
+.dpill{flex-shrink:0;padding:7px 14px;border:1px solid var(--border);border-radius:20px;background:var(--card);font-size:12px;cursor:pointer;color:var(--muted);font-family:var(--ui);transition:all .2s;white-space:nowrap}
+.dpill.active{background:var(--emerald);color:#fff;border-color:transparent}
+.dcard{margin:8px 14px}
+.dcard-title{font-weight:600;font-size:14px;color:var(--text);margin-bottom:10px}
+.dcard-arabic{font-family:var(--arabic);font-size:24px;line-height:1.8;text-align:right;direction:rtl;color:var(--emerald);margin-bottom:10px}
+.dcard-tr{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:6px}
+.dcard-uz{font-size:13px;color:var(--text);line-height:1.6}
+
+/* SPINNER */
+.spin{display:flex;align-items:center;justify-content:center;padding:40px}
+.spin svg{animation:spn 1s linear infinite;color:var(--emerald)}
+@keyframes spn{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav)+16px);left:50%;transform:translateX(-50%);background:var(--emerald);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(11,94,53,0.3)}
+.toast.show{opacity:1}
+
+.empty{text-align:center;padding:40px 20px}
+.empty-icon{font-size:44px;margin-bottom:10px}
+.empty p{color:var(--muted);font-size:13px}
+
+/* Tasbeh pulse */
+@keyframes tpulse{0%{box-shadow:0 8px 32px rgba(11,94,53,0.38)}50%{box-shadow:0 8px 40px rgba(11,94,53,0.65)}100%{box-shadow:0 8px 32px rgba(11,94,53,0.38)}}
+.tbtn.pulse{animation:tpulse 0.3s ease-out}
+
+/* Scroll bar */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">🕌</div>
+    <span class="hdr-title">Masjidlar</span>
+  </div>
+  <div class="hdr-right">
+    <button class="region-btn" onclick="toggleRegionDD()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="regionLabel">Andijon</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+  </div>
+  <!-- Region dropdown -->
+  <div class="region-dropdown" id="regionDD">
+    <div class="rdd-item sel" data-region="Andijon" onclick="selectRegion(this)">🏙 Andijon viloyati</div>
+    <div class="rdd-item" data-region="Buxoro" onclick="selectRegion(this)">🏙 Buxoro viloyati</div>
+    <div class="rdd-item" data-region="Farg'ona" onclick="selectRegion(this)">🏙 Farg'ona viloyati</div>
+    <div class="rdd-item" data-region="Jizzax" onclick="selectRegion(this)">🏙 Jizzax viloyati</div>
+    <div class="rdd-item" data-region="Namangan" onclick="selectRegion(this)">🏙 Namangan viloyati</div>
+    <div class="rdd-item" data-region="Navoiy" onclick="selectRegion(this)">🏙 Navoiy viloyati</div>
+    <div class="rdd-item" data-region="Qashqadaryo" onclick="selectRegion(this)">🏙 Qashqadaryo viloyati</div>
+    <div class="rdd-item" data-region="Samarqand" onclick="selectRegion(this)">🏙 Samarqand viloyati</div>
+    <div class="rdd-item" data-region="Sirdaryo" onclick="selectRegion(this)">🏙 Sirdaryo viloyati</div>
+    <div class="rdd-item" data-region="Surxandaryo" onclick="selectRegion(this)">🏙 Surxandaryo viloyati</div>
+    <div class="rdd-item" data-region="Toshkent" onclick="selectRegion(this)">🏙 Toshkent viloyati</div>
+    <div class="rdd-item" data-region="Xorazm" onclick="selectRegion(this)">🏙 Xorazm viloyati</div>
+    <div class="rdd-item" data-region="Qoraqalpog'iston" onclick="selectRegion(this)">🏙 Qoraqalpog'iston</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-greeting">Assalamu alaykum 🌙</div>
+    <div class="hero-time" id="heroTime">--:--</div>
+    <div class="hero-date" id="heroDate">-- kun</div>
+    <div class="hero-hijri" id="heroHijri"></div>
+    <div class="hero-region" onclick="toggleRegionDD()">
+      📍 <span id="heroRegion">Andijon</span> viloyati
+    </div>
+  </div>
+  <div class="pstrip" id="pstrip">
+    <div class="ppill"><div class="ppname">Yuklanmoqda</div><div class="pptime">...</div></div>
+  </div>
+  <div class="card cd-card">
+    <div class="cd-label">⏳ Keyingi namozgacha</div>
+    <div class="cd-val" id="cdVal">--:--:--</div>
+    <div class="cd-name" id="cdName">yuklanmoqda...</div>
+  </div>
+  <div class="stitle">Tezkor Kirish</div>
+  <div class="qgrid">
+    <div class="qcard" onclick="navTo('quran')">
+      <div class="qcard-icon">📖</div>
+      <div class="qcard-label">Qur'on</div>
+    </div>
+    <div class="qcard" onclick="navTo('tasbeh')">
+      <div class="qcard-icon">📿</div>
+      <div class="qcard-label">Tasbeh</div>
+    </div>
+    <div class="qcard" onclick="navTo('qibla')">
+      <div class="qcard-icon">🧭</div>
+      <div class="qcard-label">Qibla</div>
+    </div>
+    <div class="qcard" onclick="navTo('duas')">
+      <div class="qcard-icon">🤲</div>
+      <div class="qcard-label">Duolar</div>
+    </div>
+  </div>
+</div>
+
+<!-- QURAN -->
+<div class="page" id="page-quran">
+  <div class="qtabs">
+    <button class="qtab active" onclick="switchQTab('surahs',this)">Suralar</button>
+    <button class="qtab" onclick="switchQTab('bookmarks',this)">Saqlangan</button>
+  </div>
+  <div id="qtab-surahs">
+    <div class="reciter-wrap">
+      <select id="reciterSel" onchange="currentReciter=this.value">
+        <option value="ar.alafasy">Mishary Rashid Al-Afasy</option>
+        <option value="ar.abdulbasitmurattal">Abdul Basit (Murattal)</option>
+        <option value="ar.mahermuaiqly">Maher Al Muaiqly</option>
+        <option value="ar.husary">Mahmoud Khalil Al-Husary</option>
+        <option value="ar.minshawi">Mohamed Siddiq Al-Minshawi</option>
+        <option value="ar.saoodshuraym">Saud Al-Shuraim</option>
+      </select>
+    </div>
+    <div class="slist" id="surahList">
+      <div class="spin"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+    </div>
+  </div>
+  <div id="qtab-bookmarks" style="display:none">
+    <div class="stitle">Saqlangan Oyatlar</div>
+    <div class="bm-section" id="bmList"></div>
+  </div>
+  <!-- READER OVERLAY -->
+  <div class="reader" id="reader">
+    <div class="reader-hdr">
+      <button class="reader-back" onclick="closeReader()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="reader-titles">
+        <div class="reader-name" id="readerName">--</div>
+        <div class="reader-sub" id="readerSub">--</div>
+      </div>
+      <button class="reader-play-btn" onclick="playFromStart()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+    </div>
+    <div class="bismillah" id="bismillahEl">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+    <div id="ayahContainer">
+      <div class="spin"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+    </div>
+    <!-- AUDIO PLAYER inside reader -->
+    <div class="aplayer" id="audioPlayer">
+      <div class="apl-info">
+        <div class="apl-thumb">🎵</div>
+        <div class="apl-meta">
+          <div class="apl-surah" id="aplSurah">--</div>
+          <div class="apl-rec" id="aplRec">--</div>
+        </div>
+        <button class="apl-close" onclick="closeAudio()">✕</button>
+      </div>
+      <div class="apl-ctrls">
+        <button class="apl-btn" onclick="prevAyah()">⏮</button>
+        <input type="range" class="apl-prog" id="aplProg" value="0" min="0" max="100" oninput="seekAudio(this.value)">
+        <span class="apl-time" id="aplTime">0:00</span>
+        <button class="apl-play" id="aplPlayBtn" onclick="togglePlay()">▶</button>
+        <button class="apl-btn" onclick="nextAyahFn()">⏭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOSQUE -->
+<div class="page" id="page-mosque" style="padding-bottom:0">
+  <div class="map-container" id="mapContainer" style="margin:0;border-radius:0;height:calc(100vh - var(--hdr) - var(--nav));border:none">
+    <div class="map-loading" id="mapLoading" style="flex-direction:column;gap:12px">
+      <div style="font-size:48px">🕌</div>
+      <div style="font-weight:600;font-size:15px">Yaqin masjidlarni ko'rish uchun</div>
+      <button class="loc-btn" style="margin:0;max-width:260px" onclick="findNearbyMosques()">
+        📍 Joylashuvni aniqlash
+      </button>
+    </div>
+    <div id="map" style="display:none;width:100%;height:100%"></div>
+  </div>
+</div>
+
+<!-- TASBEH -->
+<div class="page" id="page-tasbeh">
+  <div class="tasbeh-page">
+    <div class="tasbeh-chips" id="tasbehChips"></div>
+    <div class="tarabic" id="tasbehArabic"></div>
+    <div class="tuz" id="tasbehUz"></div>
+    <div class="tasbeh-ring-wrap">
+      <div class="t-ring">
+        <svg class="t-ring-svg" viewBox="0 0 200 200">
+          <circle class="track" cx="100" cy="100" r="88"/>
+          <circle class="prog" id="tRingProg" cx="100" cy="100" r="88"/>
+        </svg>
+        <div>
+          <div class="t-num" id="tCount">0</div>
+          <div class="t-target" id="tTarget">/ 33</div>
+        </div>
+      </div>
+    </div>
+    <button class="tbtn" id="tasbehBtn" onclick="pressTasbeh()">
+      <span class="tbtn-icon">📿</span>
+      <span class="tbtn-label">Bosing</span>
+    </button>
+    <div class="t-sets" id="tSets" style="margin-top:16px">Davralar: 0</div>
+    <button class="t-reset" onclick="resetTasbeh()">↺ Yangilash</button>
+  </div>
+</div>
+
+<!-- QIBLA -->
+<div class="page" id="page-qibla">
+  <div class="qibla-page" id="qiblaPage">
+    <div class="qibla-icon">🕋</div>
+    <div class="qibla-title">Qibla Yo'nalishi</div>
+    <div class="compass-outer" id="compassOuter">
+      <div class="compass-rose"></div>
+      <span class="cdir cn">S</span>
+      <span class="cdir cs">J</span>
+      <span class="cdir ce">Sh</span>
+      <span class="cdir cw">G'</span>
+      <div style="position:absolute;top:50%;left:50%;width:0;height:0">
+        <div id="qiblaArm" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform 0.4s cubic-bezier(.25,.46,.45,.94)">
+          <div class="qneedle" style="width:4px;height:108px;border-radius:3px 3px 0 0;background:linear-gradient(to bottom,var(--gold) 0%,var(--gold) 50%,var(--emerald) 50%);margin:0 auto"></div>
+        </div>
+      </div>
+      <div class="qcenter"></div>
+    </div>
+    <div class="qibla-deg" id="qiblaDeg">-- °</div>
+    <div class="qibla-label">Qibla burchagi (shimoldan)</div>
+    <div class="qibla-status" id="qiblaStatus">Qiblani topish uchun tugmani bosing</div>
+    <div class="qibla-acc" id="qiblaAcc"></div>
+    <button class="loc-btn" style="max-width:280px;margin-top:4px" onclick="startQibla()">
+      🧭 Qiblani Aniqlash
+    </button>
+  </div>
+</div>
+
+<!-- DUAS -->
+<div class="page" id="page-duas">
+  <div class="stitle">Duolar va Zikrlar</div>
+  <div class="dua-cats" id="duaCats"></div>
+  <div id="duaList" style="margin-top:8px"></div>
+</div>
+
+</div><!-- end main -->
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="nitem active" id="nav-home" onclick="navTo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Bosh
+    <div class="nitem-dot"></div>
+  </button>
+  <button class="nitem" id="nav-quran" onclick="navTo('quran')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Qur'on
+    <div class="nitem-dot"></div>
+  </button>
+  <!-- CENTER MOSQUE BUTTON -->
+  <button class="nitem-masjid" id="nav-mosque" onclick="navTo('mosque')">
+    <div class="nitem-masjid-circle">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+        <path d="M12 2C9 2 7 5 7 7v1H5v13h14V8h-2V7c0-2-2-5-5-5z"/>
+        <path d="M10 21v-6h4v6"/>
+        <path d="M12 2v5"/>
+        <circle cx="12" cy="4" r="1" fill="white"/>
+      </svg>
+    </div>
+    <span>Masjidlar</span>
+  </button>
+  <button class="nitem" id="nav-tasbeh" onclick="navTo('tasbeh')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 9V3M9 12H3M12 15v6M15 12h6"/></svg>
+    Tasbeh
+    <div class="nitem-dot"></div>
+  </button>
+  <button class="nitem" id="nav-qibla" onclick="navTo('qibla')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Qibla
+    <div class="nitem-dot"></div>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Mosque Selection Modal -->
+<div class="mmodal-overlay" id="mModal">
+  <div class="mmodal">
+    <div class="mmodal-handle"></div>
+    <div class="mmodal-name" id="mModalName">--</div>
+    <div class="mmodal-addr" id="mModalAddr">--</div>
+    <div class="mmodal-btns">
+    <button class="mmodal-btn primary" onclick="openRoute()">
+    🗺️ Yo'l ko'rsatish
+    </button>
+    <button class="mmodal-btn secondary" onclick="closeMModal()">
+    ✕ Yopish
+    </button>
+    </div>
+  </div>
+</div>
+
+<audio id="audioEl" preload="none"></audio>
+
+<script>
+// ===== THEME =====
+let isDark = localStorage.getItem('theme_v2') === 'dark';
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+function toggleTheme() { isDark = !isDark; localStorage.setItem('theme_v2', isDark ? 'dark' : 'light'); applyTheme(); }
+applyTheme();
+
+// ===== REGION =====
+let currentRegion = localStorage.getItem('region_v2') || 'Andijon';
+document.getElementById('regionLabel').textContent = currentRegion;
+document.getElementById('heroRegion').textContent = currentRegion;
+
+function toggleRegionDD() {
+  const dd = document.getElementById('regionDD');
+  dd.classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.region-btn') && !e.target.closest('.region-dropdown') && !e.target.closest('.hero-region')) {
+    document.getElementById('regionDD').classList.remove('open');
+  }
+});
+
+function selectRegion(el) {
+  currentRegion = el.dataset.region;
+  localStorage.setItem('region_v2', currentRegion);
+  document.getElementById('regionLabel').textContent = currentRegion;
+  document.getElementById('heroRegion').textContent = currentRegion;
+  document.querySelectorAll('.rdd-item').forEach(r => r.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('regionDD').classList.remove('open');
+  fetchPrayerTimes();
+}
+
+// ===== NAV =====
+const PAGES = ['home','quran','mosque','tasbeh','qibla','duas'];
+function navTo(name) {
+  PAGES.forEach(p => {
+    const pg = document.getElementById('page-'+p);
+    const nb = document.getElementById('nav-'+p);
+    if (pg) pg.classList.remove('active');
+    if (nb) nb.classList.remove('active');
+  });
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  if (name === 'bookmarks') renderBookmarks();
+  if (name === 'mosque') {
+    // Avtomatik joylashuvni so'rash
+    if (!userLat) {
+      findNearbyMosques();
+    } else {
+      initMap();
+    }
+  }
+}
+
+// ===== CLOCK =====
+const pNames = ['Bomdod','Quyosh','Peshin','Asr','Shom','Xufton'];
+let pTimes = [];
+
+function getHijri() {
+  try { return new Date().toLocaleDateString('ar-SA-u-ca-islamic',{day:'numeric',month:'long',year:'numeric'}); } catch(e){return '';}
+}
+function updateClock() {
+  const n = new Date();
+  document.getElementById('heroTime').textContent = n.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('heroDate').textContent = n.toLocaleDateString('uz-UZ',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('heroHijri').textContent = getHijri();
+  if (pTimes.length) updateCountdown(n);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function updateCountdown(now) {
+  const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+  let nextIdx = -1, nextSec = Infinity;
+  pTimes.forEach((t, i) => {
+    const [h,m] = t.split(':').map(Number);
+    const s = h*3600 + m*60;
+    if (s > nowSec && s < nextSec) { nextSec = s; nextIdx = i; }
+  });
+  let diff;
+  if (nextIdx === -1) {
+    const [h,m] = pTimes[0].split(':').map(Number);
+    nextSec = h*3600+m*60+86400; nextIdx = 0; diff = nextSec - nowSec;
+  } else { diff = nextSec - nowSec; }
+  const h = Math.floor(diff/3600), m = Math.floor((diff%3600)/60), s = diff%60;
+  document.getElementById('cdVal').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  document.getElementById('cdName').textContent = pNames[nextIdx] + ' namozi';
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+// ===== PRAYER TIMES via islomapi.uz =====
+async function fetchPrayerTimes() {
+  const region = currentRegion;
+  try {
+    const today = new Date();
+    const d = today.getDate(), m = today.getMonth()+1, y = today.getFullYear();
+    const url = `https://islomapi.uz/api/present?region=${encodeURIComponent(region)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.times) {
+      const t = data.times;
+      pTimes = [t.tong_saharlik||t.bomdod, t.quyosh, t.peshin, t.asr, t.shom, t.xufton].filter(Boolean);
+      if (pTimes.length < 6) throw new Error('bad');
+    } else throw new Error('no times');
+  } catch(e) {
+    // Fallback: aladhan for Andijan coords
+    const coordsMap = {
+      'Andijon':[40.7821,72.3442], 'Buxoro':[39.7747,64.4286], "Farg'ona":[40.3834,71.7878],
+      'Jizzax':[40.1158,67.8422], 'Namangan':[41.0011,71.6658], 'Navoiy':[40.1033,65.3791],
+      'Qashqadaryo':[38.8611,65.7877], 'Samarqand':[39.6542,66.9597], 'Sirdaryo':[40.8393,68.6642],
+      'Surxandaryo':[37.9401,67.5717], 'Toshkent':[41.2995,69.2401], 'Xorazm':[41.5492,60.6324],
+      "Qoraqalpog'iston":[42.4583,59.6166]
+    };
+    const [lat,lon] = coordsMap[currentRegion] || [40.7821,72.3442];
+    try {
+      const today = new Date();
+      const d = today.getDate(), m = today.getMonth()+1, y = today.getFullYear();
+      const r2 = await fetch(`https://api.aladhan.com/v1/timings/${d}-${m}-${y}?latitude=${lat}&longitude=${lon}&method=3`);
+      const d2 = await r2.json();
+      const t = d2.data.timings;
+      pTimes = [t.Fajr, t.Sunrise, t.Dhuhr, t.Asr, t.Maghrib, t.Isha];
+    } catch(e2) {
+      pTimes = ['05:10','06:38','13:05','16:45','19:22','20:55'];
+    }
+  }
+  renderPrayerStrip();
+}
+
+function renderPrayerStrip() {
+  const now = new Date();
+  const nowSec = now.getHours()*3600+now.getMinutes()*60;
+  const el = document.getElementById('pstrip');
+  let nextSet = false;
+  el.innerHTML = pTimes.map((t, i) => {
+    const [h,m] = t.split(':').map(Number);
+    const sec = h*3600+m*60;
+    let cls = '';
+    if (sec < nowSec) cls = 'passed';
+    else if (!nextSet) { cls = 'next-prayer'; nextSet = true; }
+    return `<div class="ppill ${cls}"><div class="ppname">${pNames[i]}</div><div class="pptime">${t}</div></div>`;
+  }).join('');
+}
+
+fetchPrayerTimes();
+
+let userLat = null, userLon = null, mapInited = false, selectedMosque = null;
+let leafletMap = null, routeLayer = null;
+
+function calcDist(lat1,lon1,lat2,lon2) {
+  const R=6371000, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function formatDist(m) {
+  if(m<1000) return Math.round(m)+' m';
+  return (m/1000).toFixed(1)+' km';
+}
+function formatMin(m) {
+  const min = Math.round(m/80); // 80m/min yurish tezligi
+  if(min<60) return min+' daq';
+  return Math.floor(min/60)+'s '+min%60+'d';
+}
+
+// mosquesDB ni o'chirib tashlab, bo'sh massiv yaratamiz
+let allMosques = []; 
+
+function findNearbyMosques() {
+  showToast('📍 Joylashuv aniqlanmoqda...');
+  
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLon = pos.coords.longitude;
+    showToast('🕌 Masjidlar qidirilmoqda...');
+    
+    // Overpass API — OpenStreetMap dan real masjidlarni izlash
+    const radius = 10000; // 10 km radiusda qidiradi
+    
+    // Qidiruv so'rovini kuchaytirdik. Endi hammasini topadi.
+    const query = `[out:json][timeout:25];
+    (
+      node["amenity"="place_of_worship"]["religion"="muslim"](around:${radius},${userLat},${userLon});
+      way["amenity"="place_of_worship"]["religion"="muslim"](around:${radius},${userLat},${userLon});
+      relation["amenity"="place_of_worship"]["religion"="muslim"](around:${radius},${userLat},${userLon});
+      node["building"="mosque"](around:${radius},${userLat},${userLon});
+      way["building"="mosque"](around:${radius},${userLat},${userLon});
+    );
+    out center;`;
+
+    fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
+      .then(r => r.json())
+      .then(data => {
+        if (data.elements && data.elements.length > 0) {
+          allMosques = data.elements.map(el => {
+            const lat = el.lat || el.center?.lat;
+            const lon = el.lon || el.center?.lon;
+            if (!lat || !lon) return null;
+            
+            const distM = calcDist(userLat, userLon, lat, lon);
+            const name = el.tags?.name || el.tags?.['name:uz'] || el.tags?.['name:ru'] || 'Masjid';
+            
+            return {
+              name,
+              addr: el.tags?.['addr:street'] || el.tags?.['addr:full'] || 'Manzil aniqlanmagan',
+              lat,
+              lon,
+              distM,
+              dist: formatDist(distM),
+              mins: formatMin(distM)
+            };
+          }).filter(m => m !== null).sort((a,b) => a.distM - b.distM);
+          
+        } else {
+          showToast('Buzoq radiusda masjid topilmadi');
+          allMosques = [];
+        }
+        initMap();
+      })
+      .catch((err) => {
+        console.error("Overpass xatoligi: ", err);
+        showToast('❌ Xaritalarni yuklashda xatolik yuz berdi');
+        allMosques = [];
+        initMap();
+      });
+  }, (error) => {
+    console.error("Geolokatsiya xatoligi: ", error);
+    showToast('❌ Joylashuvga ruxsat berilmadi');
+  }, {enableHighAccuracy:true, timeout: 10000});
+}
+
+function initMap() {
+  document.getElementById('map').style.display = 'block';
+  document.getElementById('mapLoading').style.display = 'none';
+
+  if (!mapInited) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(link);
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    script.onload = () => {
+      mapInited = true;
+      buildMap();
+    };
+    document.body.appendChild(script);
+  } else {
+    buildMap();
+  }
+}
+
+function buildMap() {
+  if (leafletMap) { leafletMap.remove(); leafletMap = null; }
+
+  const lat = userLat || 40.7821;
+  const lon = userLon || 72.3442;
+  const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  leafletMap = L.map('map', {zoomControl:false, attributionControl:false}).setView([lat, lon], 15);
+
+  const tileUrl = isDarkNow
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  L.tileLayer(tileUrl, { maxZoom:19 }).addTo(leafletMap);
+  L.control.zoom({ position:'bottomright' }).addTo(leafletMap);
+
+  // Foydalanuvchi markeri
+  if (userLat) {
+    const pulseIcon = L.divIcon({
+      className:'',
+      html:`<div style="width:18px;height:18px;border-radius:50%;background:#137040;border:3px solid #fff;box-shadow:0 0 0 4px rgba(19,112,64,0.3)"></div>`,
+      iconSize:[18,18], iconAnchor:[9,9]
+    });
+    L.marker([userLat, userLon], {icon:pulseIcon}).addTo(leafletMap).bindPopup('📍 Siz shu yerdasiz');
+  }
+
+  // Masjid markerlar
+  allMosques.forEach(m => {
+    const icon = L.divIcon({
+      className:'',
+      html:`<div style="background:#0b5e35;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(0,0,0,0.35);border:2px solid white;cursor:pointer">🕌</div>`,
+      iconSize:[36,36], iconAnchor:[18,18]
+    });
+    L.marker([m.lat, m.lon], {icon}).addTo(leafletMap).on('click', () => openMosqueModal(m));
+  });
+
+  showToast('✅ '+allMosques.length+' ta masjid topildi');
+}
+
+function openMosqueModal(m) {
+  selectedMosque = m;
+  document.getElementById('mModalName').textContent = m.name;
+  document.getElementById('mModalAddr').textContent = m.addr + (m.dist ? ' · 🚶 '+m.dist+(m.mins?' ('+m.mins+')':'') : '');
+  document.getElementById('mModal').classList.add('open');
+  if (leafletMap) leafletMap.setView([m.lat, m.lon], 16);
+}
+
+
+function closeMModal() { document.getElementById('mModal').classList.remove('open'); }
+document.getElementById('mModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeMModal(); });
+
+function openRoute() {
+  if (!selectedMosque || !leafletMap) return;
+  closeMModal();
+  if (routeLayer) { leafletMap.removeLayer(routeLayer); routeLayer=null; }
+  const {lat, lon} = selectedMosque;
+  const fromLat = userLat || lat;
+  const fromLon = userLon || lon;
+  // OSRM route chizish
+  fetch(`https://router.project-osrm.org/route/v1/foot/${fromLon},${fromLat};${lon},${lat}?overview=full&geometries=geojson`)
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.routes && d.routes[0]) {
+        const coords = d.routes[0].geometry;
+        routeLayer = L.geoJSON(coords, {
+          style:{ color:'#137040', weight:5, opacity:0.85, dashArray:'8,6', lineCap:'round' }
+        }).addTo(leafletMap);
+        leafletMap.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
+        const distM = d.routes[0].distance;
+        const minWalk = Math.round(distM/80);
+        showToast(`🚶 ${formatDist(distM)} · ~${minWalk} daqiqa`);
+      }
+    })
+    .catch(()=>showToast('Yo\'l chizishda xatolik'));
+}
+
+// ===== QURAN =====
+let surahs = [], currentSurah = null, currentReciter = 'ar.alafasy';
+let bookmarks = JSON.parse(localStorage.getItem('bm_v2') || '[]');
+let curAyah = 0;
+const audioEl = document.getElementById('audioEl');
+
+const SUZ = {1:'Al-Fotiha',2:'Al-Baqara',3:'Ol Imron',4:'An-Niso',5:'Al-Moida',6:'Al-Anom',7:'Al-Arof',8:'Al-Anfol',9:'At-Tavba',10:'Yunus',11:'Hud',12:'Yusuf',13:'Ar-Rod',14:'Ibrohim',15:'Al-Hijr',16:'An-Nahl',17:'Al-Isro',18:'Al-Kahf',19:'Maryam',20:'Toho',21:'Al-Anbiyo',22:'Al-Hajj',23:'Al-Muminun',24:'An-Nur',25:'Al-Furqon',26:'Ash-Shuaro',27:'An-Naml',28:'Al-Qasas',29:'Al-Ankabut',30:'Ar-Rum',31:'Luqmon',32:'As-Sajda',33:'Al-Ahzob',34:'Saba',35:'Fotir',36:'Yo Sin',37:'As-Soffot',38:'Sod',39:'Az-Zumar',40:'Gofir',41:'Fussilat',42:'Ash-Shuro',43:'Az-Zuxruf',44:'Ad-Duxon',45:'Al-Josiya',46:'Al-Ahqof',47:'Muhammad',48:'Al-Fath',49:'Al-Hujurot',50:'Qof',51:'Az-Zoriyot',52:'At-Tur',53:'An-Najm',54:'Al-Qamar',55:'Ar-Rahman',56:'Al-Voqia',57:'Al-Hadid',58:'Al-Mujodala',59:'Al-Hashr',60:'Al-Mumtahana',61:'As-Saff',62:'Al-Jumuah',63:'Al-Munofiqun',64:'At-Tagobun',65:'At-Taloq',66:'At-Tahrim',67:'Al-Mulk',68:'Al-Qalam',69:'Al-Haqqa',70:'Al-Maarij',71:'Nuh',72:'Al-Jinn',73:'Al-Muzzammil',74:'Al-Muddaththir',75:'Al-Qiyama',76:'Al-Incon',77:'Al-Mursalot',78:'An-Naba',79:'An-Noziot',80:'Abasa',81:'At-Takwir',82:'Al-Infitor',83:'Al-Mutaffifin',84:'Al-Inshiqoq',85:'Al-Buruj',86:'At-Toriq',87:'Al-Ala',88:'Al-Goshiya',89:'Al-Fajr',90:'Al-Balad',91:'Ash-Shams',92:'Al-Layl',93:'Ad-Duho',94:'Al-Inshiroh',95:'At-Tin',96:'Al-Aloq',97:'Al-Qadr',98:'Al-Bayyina',99:'Az-Zilzol',100:'Al-Odiyot',101:'Al-Qoria',102:'At-Takosur',103:'Al-Asr',104:'Al-Humaza',105:'Al-Fil',106:'Quraysh',107:'Al-Mooun',108:'Al-Kavsar',109:'Al-Kofirun',110:'An-Nasr',111:'Al-Masad',112:'Al-Ixlos',113:'Al-Falaq',114:'An-Nos'};
+
+const RECITER_NAMES = {'ar.alafasy':'Mishary Rashid Al-Afasy','ar.abdulbasitmurattal':'Abdul Basit (Murattal)','ar.mahermuaiqly':'Maher Al Muaiqly','ar.husary':'Mahmoud Khalil Al-Husary','ar.minshawi':'Mohamed Siddiq Al-Minshawi','ar.saoodshuraym':'Saud Al-Shuraim'};
+const AUDIO_FOLDERS = {'ar.alafasy':'Alafasy_128kbps','ar.abdulbasitmurattal':'Abdul_Basit_Murattal_192kbps','ar.mahermuaiqly':'Maher_AlMuaiqly_128kbps','ar.husary':'Husary_128kbps','ar.minshawi':'Minshawy_Murattal_128kbps','ar.saoodshuraym':'Saood_ash-Shuraym_128kbps'};
+
+function switchQTab(tab, btn) {
+  document.querySelectorAll('.qtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('qtab-surahs').style.display = tab==='surahs'?'':'none';
+  document.getElementById('qtab-bookmarks').style.display = tab==='bookmarks'?'':'none';
+  if (tab==='bookmarks') renderBookmarks();
+}
+
+async function loadSurahs() {
+  try {
+    const r = await fetch('https://api.alquran.cloud/v1/surah');
+    const d = await r.json();
+    surahs = d.data;
+    renderSurahList();
+  } catch(e) {
+    document.getElementById('surahList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Internet ulanishi yo\'q</div>';
+  }
+}
+
+function renderSurahList() {
+  const el = document.getElementById('surahList');
+  el.innerHTML = surahs.map(s => {
+    const isFav = bookmarks.some(b=>b.sn===s.number&&b.type==='surah');
+    return `<div class="srow" onclick="openSurah(${s.number})">
+      <div class="snum">${s.number}</div>
+      <div class="sinfo">
+        <div class="sname">${SUZ[s.number]||s.englishName}</div>
+        <div class="smeta">${s.numberOfAyahs} oyat · ${s.revelationType==='Meccan'?'Makka':'Madina'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="sarabic">${s.name}</div>
+        <button class="fav-btn ${isFav?'on':''}" onclick="event.stopPropagation();toggleSurahFav(${s.number},'${s.name}','${SUZ[s.number]||s.englishName}')">♥</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSurahFav(num,arabic,uz) {
+  const idx = bookmarks.findIndex(b=>b.sn===num&&b.type==='surah');
+  if (idx>=0){bookmarks.splice(idx,1);showToast('Saqlashdan o\'chirildi');}
+  else{bookmarks.push({sn:num,arabic,uz,type:'surah',t:Date.now()});showToast('♥ Saqlandi');}
+  localStorage.setItem('bm_v2',JSON.stringify(bookmarks));
+  renderSurahList();
+}
+
+async function openSurah(num) {
+  const s = surahs.find(x=>x.number===num);
+  currentSurah = s; curAyah = 0;
+  document.getElementById('readerName').textContent = `${num}. ${SUZ[num]||s.englishName}`;
+  document.getElementById('readerSub').textContent = RECITER_NAMES[currentReciter]||currentReciter;
+  document.getElementById('bismillahEl').style.display = num===1?'none':'block';
+  document.getElementById('ayahContainer').innerHTML = '<div class="spin"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>';
+  document.getElementById('reader').classList.add('open');
+  try {
+    const [arRes, trRes] = await Promise.all([
+      fetch(`https://api.alquran.cloud/v1/surah/${num}`),
+      fetch(`https://api.alquran.cloud/v1/surah/${num}/uz.muhammadsodiq`)
+    ]);
+    const arD = await arRes.json();
+    const trD = await trRes.json();
+    const ayahs = arD.data.ayahs;
+    const trs = trD.data?.ayahs || [];
+    document.getElementById('ayahContainer').innerHTML = ayahs.map((a,i) => {
+      const tr = trs[i]?.text || '';
+      const safeAr = a.text.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+      const safeTr = tr.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+      return `<div class="ayah-row" id="ar-${a.numberInSurah}">
+        <div class="ayah-arabic">${a.text} <span class="ayah-badge">${a.numberInSurah}</span></div>
+        <div class="ayah-tr">${tr}</div>
+        <div class="ayah-acts">
+          <button class="aact" onclick="playAyah(${num},${a.numberInSurah})">▶ Tinglash</button>
+          <button class="aact" onclick="bmAyah(${num},${a.numberInSurah},'${SUZ[num]||s.englishName}','${safeAr}','${safeTr}')">♥ Saqlash</button>
+          <button class="aact" onclick="copyText('${safeAr} (${SUZ[num]} ${num}:${a.numberInSurah})')">⧉ Nusxa</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('ayahContainer').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Yuklanishda xatolik</div>';
+  }
+}
+
+function buildAudioUrl(sNum, aNum) {
+  const s = String(sNum).padStart(3,'0');
+  const a = String(aNum).padStart(3,'0');
+  const folder = AUDIO_FOLDERS[currentReciter] || 'Alafasy_128kbps';
+  return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
+}
+
+function playAyah(sNum, aNum) {
+  const url = buildAudioUrl(sNum, aNum);
+  audioEl.src = url; audioEl.play();
+  document.getElementById('audioPlayer').style.display = 'block';
+  document.getElementById('aplSurah').textContent = `${SUZ[sNum]} · ${aNum}-oyat`;
+  document.getElementById('aplRec').textContent = RECITER_NAMES[currentReciter]||'';
+  document.getElementById('aplPlayBtn').innerHTML = '⏸';
+  curAyah = aNum;
+  highlightAyah(aNum);
+}
+
+function playFromStart() {
+  if (!currentSurah) return;
+  playAyah(currentSurah.number, 1);
+  audioEl.onended = () => {
+    const n = curAyah + 1;
+    if (n <= currentSurah.numberOfAyahs) playAyah(currentSurah.number, n);
+    else closeAudio();
+  };
+}
+
+function highlightAyah(n) {
+  document.querySelectorAll('.ayah-row').forEach(r=>r.classList.remove('highlighted'));
+  const el = document.getElementById('ar-'+n);
+  if (el) { el.classList.add('highlighted'); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+
+audioEl.ontimeupdate = () => {
+  if (audioEl.duration) {
+    document.getElementById('aplProg').value = (audioEl.currentTime/audioEl.duration)*100;
+    const s = Math.floor(audioEl.currentTime);
+    document.getElementById('aplTime').textContent = `${Math.floor(s/60)}:${pad(s%60)}`;
+  }
+};
+audioEl.onended = () => {};
+
+function togglePlay() {
+  if (audioEl.paused) { audioEl.play(); document.getElementById('aplPlayBtn').innerHTML='⏸'; }
+  else { audioEl.pause(); document.getElementById('aplPlayBtn').innerHTML='▶'; }
+}
+function seekAudio(v) { if (audioEl.duration) audioEl.currentTime=(v/100)*audioEl.duration; }
+function closeAudio() { audioEl.pause(); document.getElementById('audioPlayer').style.display='none'; }
+function prevAyah() { if (currentSurah&&curAyah>1) playAyah(currentSurah.number,curAyah-1); }
+function nextAyahFn() { if (currentSurah&&curAyah<currentSurah.numberOfAyahs) playAyah(currentSurah.number,curAyah+1); }
+function closeReader() { document.getElementById('reader').classList.remove('open'); closeAudio(); }
+
+function bmAyah(sn, an, sname, arabic, tr) {
+  const key = sn+':'+an;
+  const idx = bookmarks.findIndex(b=>b.key===key);
+  if(idx>=0){bookmarks.splice(idx,1);showToast('O\'chirildi');}
+  else{bookmarks.push({key,sn,an,sname,arabic,tr,type:'ayah',t:Date.now()});showToast('♥ Saqlandi');}
+  localStorage.setItem('bm_v2',JSON.stringify(bookmarks));
+}
+
+function copyText(t) {
+  navigator.clipboard?.writeText(t).then(()=>showToast('✓ Nusxa olindi'));
+}
+
+function renderBookmarks() {
+  const el = document.getElementById('bmList');
+  const bms = bookmarks.filter(b=>b.type==='ayah');
+  if (!bms.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🔖</div><p>Hali oyat saqlanmagan</p></div>'; return; }
+  el.innerHTML = bms.map(b=>`
+    <div class="bm-row" onclick="openSurah(${b.sn})">
+      <div class="bm-info">
+        <div class="bm-name">${b.sname} ${b.sn}:${b.an}</div>
+        <div class="bm-sub">${(b.arabic||'').slice(0,50)}...</div>
+      </div>
+      <button class="bm-del" onclick="event.stopPropagation();delBm('${b.key}')">✕</button>
+    </div>`).join('');
+}
+
+function delBm(key) {
+  bookmarks = bookmarks.filter(b=>b.key!==key);
+  localStorage.setItem('bm_v2',JSON.stringify(bookmarks));
+  renderBookmarks();
+}
+
+// ===== TASBEH =====
+const TASBEHS = [
+  {arabic:'سُبْحَانَ اللَّهِ', uz:'Subhanalloh', target:33},
+  {arabic:'الْحَمْدُ لِلَّهِ', uz:'Alhamdulilloh', target:33},
+  {arabic:'اللَّهُ أَكْبَرُ', uz:'Allohu Akbar', target:34},
+  {arabic:'لَا إِلَهَ إِلَّا اللَّهُ', uz:'La ilaha illalloh', target:100},
+  {arabic:'أَسْتَغْفِرُ اللَّهَ', uz:"Astag'firulloh", target:100},
+  {arabic:'صَلِّ عَلَى مُحَمَّدٍ', uz:'Salavot', target:100},
+];
+let tIdx=0, tCount=0, tSets=0;
+
+function initTasbeh() {
+  const el = document.getElementById('tasbehChips');
+  el.innerHTML = TASBEHS.map((t,i)=>`<button class="tchip ${i===0?'active':''}" onclick="selTasbeh(${i})">${t.uz}</button>`).join('');
+  updateTUI();
+}
+
+function selTasbeh(i) {
+  tIdx=i; tCount=0; tSets=0;
+  document.querySelectorAll('.tchip').forEach((c,j)=>c.classList.toggle('active',j===i));
+  updateTUI();
+}
+
+function updateTUI() {
+  const t = TASBEHS[tIdx];
+  document.getElementById('tasbehArabic').textContent = t.arabic;
+  document.getElementById('tasbehUz').textContent = t.uz;
+  document.getElementById('tCount').textContent = tCount;
+  document.getElementById('tTarget').textContent = '/ '+t.target;
+  document.getElementById('tSets').textContent = 'Davralar: '+tSets;
+  const circ = 2*Math.PI*88;
+  const offset = circ - (tCount/t.target)*circ;
+  document.getElementById('tRingProg').style.strokeDashoffset = offset;
+  document.getElementById('tRingProg').style.strokeDasharray = circ;
+}
+
+function pressTasbeh() {
+  tCount++;
+  const t = TASBEHS[tIdx];
+  const btn = document.getElementById('tasbehBtn');
+  if (tCount >= t.target) {
+    tSets++; tCount=0;
+    showToast(`🎉 ${tSets}-davra tugadi!`);
+    if (navigator.vibrate) navigator.vibrate([100,50,100]);
+  } else {
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+  btn.classList.add('pulse');
+  setTimeout(()=>btn.classList.remove('pulse'),300);
+  updateTUI();
+}
+
+function resetTasbeh() { tCount=0; tSets=0; updateTUI(); showToast('Yangilandi'); }
+
+// ===== QIBLA =====
+let qAngle=0, watchingCompass=false, deviceOrient=0;
+
+function calcQibla(lat,lon) {
+  const kLat=21.4225*Math.PI/180, kLon=39.8262*Math.PI/180;
+  const uLat=lat*Math.PI/180, uLon=lon*Math.PI/180;
+  const y=Math.sin(kLon-uLon)*Math.cos(kLat);
+  const x=Math.cos(uLat)*Math.sin(kLat)-Math.sin(uLat)*Math.cos(kLat)*Math.cos(kLon-uLon);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+
+function startQibla() {
+  document.getElementById('qiblaStatus').textContent = '📍 Joylashuv aniqlanmoqda...';
+  navigator.geolocation.getCurrentPosition(pos => {
+    qAngle = calcQibla(pos.coords.latitude, pos.coords.longitude);
+    document.getElementById('qiblaDeg').textContent = Math.round(qAngle) + ' °';
+    document.getElementById('qiblaStatus').textContent = '📱 Telefonni yulduzsimon harakatlantiring (kalibrlash)';
+    document.getElementById('qiblaAcc').textContent = `Joylashuv aniqligi: ±${Math.round(pos.coords.accuracy)} m`;
+    startCompass();
+  }, () => {
+    showToast('❌ Joylashuvga ruxsat bering');
+    document.getElementById('qiblaStatus').textContent = 'Joylashuv ruxsatini bering';
+  }, {enableHighAccuracy:true});
+}
+
+function startCompass() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then(r=>{
+      if(r==='granted') listenCompass();
+      else { showToast('Kompas ruxsatini bering'); document.getElementById('qiblaStatus').textContent='Kompas ruxsati berilmadi'; }
+    }).catch(()=>listenCompass());
+  } else { listenCompass(); }
+}
+
+function listenCompass() {
+  if (watchingCompass) return;
+  watchingCompass = true;
+  window.addEventListener('deviceorientationabsolute', handleOrient, true);
+  window.addEventListener('deviceorientation', handleOrient, true);
+  document.getElementById('qiblaStatus').textContent = '🔄 Kompas tayyor...';
+}
+
+function handleOrient(e) {
+  let heading = null;
+  if (e.absolute && e.alpha !== null) heading = (360 - e.alpha) % 360;
+  else if (e.webkitCompassHeading != null) heading = e.webkitCompassHeading;
+  else if (e.alpha !== null) heading = (360 - e.alpha) % 360;
+  if (heading === null) return;
+  deviceOrient = heading;
+  const needle = qAngle - heading;
+  document.getElementById('qiblaArm').style.transform = `translateX(-50%) rotate(${needle}deg)`;
+  const diff = ((needle % 360) + 360) % 360;
+  const aligned = diff < 12 || diff > 348;
+  if (aligned) {
+    document.getElementById('qiblaStatus').textContent = '✅ Siz Qibla tomon turipsiiz!';
+    document.getElementById('qiblaStatus').style.color = 'var(--emerald)';
+    if (navigator.vibrate) navigator.vibrate(50);
+  } else {
+    document.getElementById('qiblaStatus').textContent = `Qibla shimoldan ${Math.round(qAngle)}° — Burilish: ${Math.round(diff < 180 ? diff : 360-diff)}°`;
+    document.getElementById('qiblaStatus').style.color = '';
+  }
+}
+
+// ===== DUAS =====
+const DUA_CATS = ['Hammasi','Uyqu','Ovqat','Safar','Salomlik','Zikr','Tong','Kech'];
+const DUAS = [
+  {c:'Uyqu',t:'Uxlashdan oldin',a:'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',tr:'Bismika Allahumma amutu wa ahya',uz:"Allohim, Sening isming bilan o'laman va tirillaman"},
+  {c:'Uyqu',t:'Uyg\'onganda',a:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',tr:"Alhamdulillahil-ladhi ahyana ba'da ma amatana wa ilayhin-nushur",uz:"O'ldirganidan keyin bizni tiriltirgan Allohga hamd bo'lsin"},
+  {c:'Ovqat',t:'Ovqat oldidan',a:'بِسْمِ اللَّهِ',tr:'Bismillah',uz:"Allohning nomi bilan boshlayman"},
+  {c:'Ovqat',t:'Ovqatdan keyin',a:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ',tr:"Alhamdulillahil-ladhi at'amana wa saqana wa ja'alana muslimin",uz:"Bizni yemdirgan, ichiradigan va muslimlardan qilgan Allohga hamd bo'lsin"},
+  {c:'Safar',t:'Uydan chiqishda',a:'بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',tr:"Bismillahi, tawakkaltu 'alallahi, wa la hawla wa la quwwata illa billah",uz:"Allohning nomi bilan, Allohga tavakkul qildim"},
+  {c:'Safar',t:'Mashinaga chiqishda',a:'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',tr:"Subhanal-ladhi sakhkhara lana hadha",uz:"Buni bizga bo'ysundirgan Alloh pokdir"},
+  {c:'Salomlik',t:'Bemorlarga dua',a:"اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ وَاشْفِهِ",tr:"Allahumma rabban-nas adhhibil-ba's washfihi",uz:"Ey odamlarning Robbi, og'riqni ket va uni shifo ber"},
+  {c:'Tong',t:'Tong zikri',a:'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ',tr:'Asbahna wa asbahal-mulku lillah',uz:"Tong qildik va mulk Allohniki bo'ldi"},
+  {c:'Kech',t:'Kech zikri',a:'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ',tr:'Amsayna wa amsal-mulku lillah',uz:"Kech qildik va mulk Allohniki bo'ldi"},
+  {c:'Zikr',t:"Istag'for",a:'أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ',tr:"Astaghfirullahal-'adhimal-ladhi la ilaha illa huwal-hayyul-qayyumu wa atubu ilayh",uz:"Buyuk Allohdan mag'firat so'rayman va Unga tavba qilaman"},
+  {c:'Zikr',t:'Durudi Ibrahim',a:'اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ',tr:"Allahumma salli 'ala Muhammadin wa 'ala ali Muhammad",uz:"Ey Alloh, Muhammadga va Muhammadning oilasiga salavot yubor"},
+];
+
+let activeDuaCat = 'Hammasi';
+function initDuas() {
+  document.getElementById('duaCats').innerHTML = DUA_CATS.map(c=>`<button class="dpill ${c==='Hammasi'?'active':''}" onclick="filterDuas('${c}',this)">${c}</button>`).join('');
+  renderDuas('Hammasi');
+}
+
+function filterDuas(cat, btn) {
+  activeDuaCat=cat;
+  document.querySelectorAll('.dpill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDuas(cat);
+}
+
+function renderDuas(cat) {
+  const list = cat==='Hammasi'?DUAS:DUAS.filter(d=>d.c===cat);
+  const el = document.getElementById('duaList');
+  if (!list.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🤲</div><p>Bu toifada dua yo\'q</p></div>'; return; }
+  el.innerHTML = list.map(d=>`
+    <div class="card dcard">
+      <div class="dcard-title">${d.t}</div>
+      <div class="dcard-arabic">${d.a}</div>
+      <div class="dcard-tr">${d.tr}</div>
+      <div class="dcard-uz">${d.uz}</div>
+      <div style="margin-top:10px">
+        <button class="aact" onclick="copyText('${d.a.replace(/'/g,'&#39;')} — ${d.uz.replace(/'/g,'&#39;')}')">⧉ Nusxa olish</button>
+      </div>
+    </div>`).join('');
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===== INIT =====
+loadSurahs();
+initTasbeh();
+initDuas();
+</script>
+</body>
+</html>
