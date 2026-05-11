@@ -47,7 +47,7 @@ body{display:flex;flex-direction:column}
 @media(min-width:640px){.hero{padding:24px 32px}.home-duas{grid-template-columns:repeat(3,1fr)}.qgrid{grid-template-columns:repeat(4,1fr)}.pstrip{gap:10px}.pstrip-wrap{padding:0 20px}.cd-card{margin:12px 20px}.qsection,.home-duas,.qgrid,.home-zikr-row{padding-left:6px;padding-right:6px}}
 
 /* HEADER */
-.hdr{height:var(--hdr);background:var(--emerald);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;position:relative;z-index:20}
+.hdr{height:auto;min-height:calc(var(--hdr) + 35px);background:var(--emerald);display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px 16px;padding-top:calc(env(safe-area-inset-top, 0px) + 35px);flex-shrink:0;position:relative;z-index:20}
 .hdr-brand{display:flex;align-items:center;gap:10px}
 .hdr-logo{width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .hdr-title{font-family:var(--serif);color:#fff;font-size:19px;letter-spacing:0.3px}
@@ -57,7 +57,7 @@ body{display:flex;flex-direction:column}
 
 /* REGION SELECT */
 .region-btn{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:8px;color:#fff;font-family:var(--ui);font-size:12px;font-weight:600;padding:5px 10px;cursor:pointer;display:flex;align-items:center;gap:5px}
-.region-dropdown{position:absolute;top:calc(var(--hdr) + 4px);right:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:999;min-width:220px;max-height:320px;overflow-y:auto;display:none}
+.region-dropdown{position:absolute;top:100%;margin-top:4px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:999;min-width:220px;max-height:320px;overflow-y:auto;display:none}
 .region-dropdown.open{display:block}
 .rdd-item{padding:11px 16px;cursor:pointer;font-size:14px;color:var(--text);border-bottom:1px solid var(--border);transition:background .15s}
 .rdd-item:last-child{border-bottom:none}
@@ -2030,9 +2030,7 @@ const DUAS = [
 
 let activeDuaCat = 'Hammasi';
 function initDuas() {
-  const cats = document.getElementById('duaCats');
-  if (!cats) return;
-  cats.innerHTML = DUA_CATS.map(c=>`<button class="dpill ${c==='Hammasi'?'active':''}" onclick="filterDuas('${c}',this)">${c}</button>`).join('');
+  document.getElementById('duaCats').innerHTML = DUA_CATS.map(c=>`<button class="dpill ${c==='Hammasi'?'active':''}" onclick="filterDuas('${c}',this)">${c}</button>`).join('');
   renderDuas('Hammasi');
 }
 
