@@ -47,7 +47,7 @@ body{display:flex;flex-direction:column}
 @media(min-width:640px){.hero{padding:24px 32px}.home-duas{grid-template-columns:repeat(3,1fr)}.qgrid{grid-template-columns:repeat(4,1fr)}.pstrip{gap:10px}.pstrip-wrap{padding:0 20px}.cd-card{margin:12px 20px}.qsection,.home-duas,.qgrid,.home-zikr-row{padding-left:6px;padding-right:6px}}
 
 /* HEADER */
-.hdr{height:var(--hdr);background:var(--emerald);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;position:relative;z-index:20}
+.hdr{height:var(--hdr);background:var(--emerald);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-top:env(safe-area-inset-top,0);flex-shrink:0;position:relative;z-index:20}
 .hdr-brand{display:flex;align-items:center;gap:10px}
 .hdr-logo{width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
 .hdr-title{font-family:var(--serif);color:#fff;font-size:19px;letter-spacing:0.3px}
@@ -320,6 +320,22 @@ body{display:flex;flex-direction:column}
 @keyframes ringComplete{0%{stroke:var(--emerald)}50%{stroke:var(--gold)}100%{stroke:var(--emerald)}}
 .ring-complete{animation:ringComplete 0.6s ease}
 
+/* ====== O'QISH STATISTIKASI ====== */
+.read-stats-page{padding:14px}
+.streak-ring-wrap{display:flex;justify-content:center;margin:10px 0 18px}
+.streak-ring-svg{transform:rotate(-90deg)}
+.streak-ring-svg .sr-track{fill:none;stroke:var(--bg2);stroke-width:10}
+.streak-ring-svg .sr-prog{fill:none;stroke:var(--gold);stroke-width:10;stroke-linecap:round;stroke-dasharray:502;stroke-dashoffset:502;transition:stroke-dashoffset .5s}
+.streak-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.streak-num{font-family:var(--serif);font-size:44px;color:var(--gold);line-height:1}
+.streak-label{font-size:11px;color:var(--muted);margin-top:2px}
+.rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rs-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
+.rs-num{font-family:var(--serif);font-size:26px;color:var(--emerald);margin-bottom:2px}
+.rs-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)}
+.rs-heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0 16px}
+.rs-hm-cell{aspect-ratio:1;border-radius:4px;background:var(--bg2)}
+
 /* Scroll bar */
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -411,6 +427,14 @@ body{display:flex;flex-direction:column}
     <div class="qcard" onclick="navTo('duas')">
       <div class="qcard-icon">🤲</div>
       <div class="qcard-label">Duolar</div>
+    </div>
+    <div class="qcard" onclick="navTo('hadis')">
+      <div class="qcard-icon">📜</div>
+      <div class="qcard-label">Hadislar</div>
+    </div>
+    <div class="qcard" onclick="navTo('readstats')">
+      <div class="qcard-icon">📊</div>
+      <div class="qcard-label">Statistika</div>
     </div>
   </div>
   <div class="qsection">
@@ -663,9 +687,90 @@ body{display:flex;flex-direction:column}
     <div class="qibla-label">Qibla burchagi (shimoldan)</div>
     <div class="qibla-status" id="qiblaStatus">Qiblani topish uchun tugmani bosing</div>
     <div class="qibla-acc" id="qiblaAcc"></div>
-    <button class="loc-btn" style="max-width:280px;margin-top:4px" onclick="startQibla()">
+    <button class="loc-btn" style="max-width:280px;margin-top:4px" id="qiblaBtn" onclick="startQiblaFlow()">
       🧭 Qiblani Aniqlash
     </button>
+  </div>
+</div>
+
+<!-- READ STATS -->
+<div class="page" id="page-readstats">
+  <div class="read-stats-page">
+    <div class="stitle" style="padding:0 0 10px">📊 O'qish Statistikam</div>
+    <div class="rs-grid">
+      <div class="rs-card">
+        <div class="rs-num" id="rs-total-surahs">0</div>
+        <div class="rs-lbl">Suralar</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-num" id="rs-total-ayahs">0</div>
+        <div class="rs-lbl">Oyatlar</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-num" id="rs-streak" style="color:var(--gold)">0🔥</div>
+        <div class="rs-lbl">Streak (kun)</div>
+      </div>
+    </div>
+    <div class="stitle" style="padding:0 0 8px">Joriy streak</div>
+    <div class="streak-ring-wrap">
+      <div style="position:relative;width:160px;height:160px">
+        <svg class="streak-ring-svg" width="160" height="160" viewBox="0 0 160 160">
+          <circle class="sr-track" cx="80" cy="80" r="70"/>
+          <circle class="sr-prog" id="srProg" cx="80" cy="80" r="70"/>
+        </svg>
+        <div class="streak-center">
+          <div class="streak-num" id="srNum">0</div>
+          <div class="streak-label">kun uzluksiz</div>
+        </div>
+      </div>
+    </div>
+    <div class="stitle" style="padding:0 0 8px">So'nggi 4 hafta</div>
+    <div class="rs-heatmap" id="rsHeatmap"></div>
+    <div style="display:flex;gap:6px;margin-bottom:4px;font-size:10px;color:var(--muted);align-items:center">
+      <div style="width:12px;height:12px;border-radius:3px;background:var(--bg2)"></div> O'qilmagan
+      <div style="width:12px;height:12px;border-radius:3px;background:var(--emerald-l);opacity:0.5"></div> Kam
+      <div style="width:12px;height:12px;border-radius:3px;background:var(--emerald)"></div> Ko'p
+    </div>
+    <div class="stitle" style="padding:12px 0 8px">Oxirgi o'qilgan suralar</div>
+    <div id="rsRecentList"></div>
+  </div>
+</div>
+
+<!-- HADISLAR -->
+<div class="page" id="page-hadis">
+  <div style="background:var(--emerald);padding:20px 16px 16px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+    <div style="font-family:var(--arabic);font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:6px;text-align:right">حَدِيثُ الْيَوْمِ</div>
+    <div style="font-family:var(--serif);font-size:20px;color:#fff">Kunlik Hadis</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px">Payg'ambarimiz (s.a.v.) so'zlari</div>
+  </div>
+  <div style="margin:14px">
+    <div id="hadisCard" style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📜</div>
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted)">Bugungi hadis</div>
+          <div id="hadisSource" style="font-size:11px;color:var(--emerald);margin-top:1px">yuklanmoqda...</div>
+        </div>
+      </div>
+      <div id="hadisArabic" style="font-family:var(--arabic);font-size:22px;color:var(--text);text-align:right;direction:rtl;line-height:1.9;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">...</div>
+      <div id="hadisUz" style="font-size:14px;color:var(--text);line-height:1.7;margin-bottom:14px">yuklanmoqda...</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="copyHadis()" style="flex:1;padding:10px;background:var(--bg2);border:none;border-radius:10px;font-family:var(--ui);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">⧉ Nusxa</button>
+        <button onclick="saveHadis()" style="flex:1;padding:10px;background:var(--gold);border:none;border-radius:10px;font-family:var(--ui);font-size:12px;font-weight:600;color:#fff;cursor:pointer">⭐ Saqlash</button>
+        <button onclick="loadNextHadis()" style="flex:1;padding:10px;background:var(--emerald);border:none;border-radius:10px;font-family:var(--ui);font-size:12px;font-weight:600;color:#fff;cursor:pointer">↻ Yangi</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:12px">📚 Hadis manbalari</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="hadisSourceGrid"></div>
+    </div>
+    <div style="margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:12px">⭐ Saqlangan hadislar</div>
+      <div id="savedHadisList">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Hali hadis saqlanmagan</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -844,7 +949,7 @@ function toggleWeekly() {
 }
 
 // ===== NAV =====
-const PAGES = ['home','quran','mosque','tasbeh','qibla','duas'];
+const PAGES = ['home','quran','mosque','tasbeh','qibla','duas','readstats','hadis'];
 function navTo(name) {
   PAGES.forEach(p => {
     const pg = document.getElementById('page-'+p);
@@ -856,12 +961,20 @@ function navTo(name) {
   document.getElementById('nav-'+name)?.classList.add('active');
   if (name === 'bookmarks') renderBookmarks();
   if (name === 'mosque') {
-    // Avtomatik joylashuvni so'rash
     if (!userLat) {
       findNearbyMosques();
     } else {
       initMap();
     }
+  }
+  if (name === 'duas') {
+    renderAsma();
+  }
+  if (name === 'readstats') {
+    renderReadStats();
+  }
+  if (name === 'hadis') {
+    loadHadis();
   }
 }
 
@@ -1580,13 +1693,43 @@ function renderBookmarks() {
   const bms = bookmarks.filter(b=>b.type==='ayah');
   if (!bms.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🔖</div><p>Hali oyat saqlanmagan</p></div>'; return; }
   el.innerHTML = bms.map(b=>`
-    <div class="bm-row" onclick="openSurah(${b.sn})">
-      <div class="bm-info">
-        <div class="bm-name">${b.sname} ${b.sn}:${b.an}</div>
-        <div class="bm-sub">${(b.arabic||'').slice(0,50)}...</div>
+    <div class="bm-swipe-wrap" style="position:relative;overflow:hidden;border-radius:12px;margin-bottom:2px">
+      <div class="bm-del-bg" style="position:absolute;right:0;top:0;bottom:0;width:80px;background:#e24b4a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;border-radius:0 12px 12px 0">O'chir</div>
+      <div class="bm-row" data-key="${b.key}" style="position:relative;background:var(--card);transform:translateX(0);transition:transform .25s cubic-bezier(.25,.46,.45,.94);touch-action:pan-y" onclick="openSurah(${b.sn})">
+        <div class="bm-info">
+          <div class="bm-name">${b.sname} ${b.sn}:${b.an}</div>
+          <div class="bm-sub">${(b.arabic||'').slice(0,50)}...</div>
+        </div>
+        <button class="bm-del" onclick="event.stopPropagation();delBm('${b.key}')">✕</button>
       </div>
-      <button class="bm-del" onclick="event.stopPropagation();delBm('${b.key}')">✕</button>
     </div>`).join('');
+  // Swipe-to-delete logikasi
+  el.querySelectorAll('.bm-row').forEach(row => {
+    let startX=0, startY=0, dx=0, swiping=false, lockAxis=false;
+    row.addEventListener('touchstart', e => {
+      startX=e.touches[0].clientX; startY=e.touches[0].clientY; dx=0; swiping=true; lockAxis=false;
+    }, {passive:true});
+    row.addEventListener('touchmove', e => {
+      if (!swiping) return;
+      const cx=e.touches[0].clientX, cy=e.touches[0].clientY;
+      if (!lockAxis) {
+        if (Math.abs(cy-startY) > Math.abs(cx-startX)) { swiping=false; return; }
+        lockAxis=true;
+      }
+      dx = Math.min(0, cx - startX);
+      row.style.transform = `translateX(${Math.max(dx,-80)}px)`;
+    }, {passive:true});
+    row.addEventListener('touchend', () => {
+      if (!swiping) return;
+      if (dx < -40) {
+        row.style.transform = 'translateX(-80px)';
+        row.onclick = null;
+      } else {
+        row.style.transform = 'translateX(0)';
+      }
+      swiping=false;
+    });
+  });
 }
 
 function delBm(key) {
@@ -1768,6 +1911,24 @@ function calcQibla(lat,lon) {
   return (Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 
+// iOS da kompas ruxsatini oldin so'rash, keyin geolokatsiya
+function startQiblaFlow() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.getElementById('qiblaStatus').textContent = '📱 Kompas ruxsati so\'ralmoqda...';
+    DeviceOrientationEvent.requestPermission()
+      .then(r => {
+        if (r === 'granted') {
+          startQibla();
+        } else {
+          document.getElementById('qiblaStatus').textContent = '❌ Kompas ruxsati kerak. iPhone Sozlamalar > Maxfiylik > Harakat va Fitnesga ruxsat bering.';
+        }
+      })
+      .catch(() => startQibla());
+  } else {
+    startQibla();
+  }
+}
+
 function startQibla() {
   document.getElementById('qiblaStatus').textContent = '📍 Joylashuv aniqlanmoqda...';
   navigator.geolocation.getCurrentPosition(pos => {
@@ -1784,24 +1945,35 @@ function startQibla() {
 
 function startCompass() {
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    DeviceOrientationEvent.requestPermission().then(r=>{
-      if(r==='granted') listenCompass();
-      else { showToast('Kompas ruxsatini bering'); document.getElementById('qiblaStatus').textContent='Kompas ruxsati berilmadi'; }
-    }).catch(()=>listenCompass());
-  } else { listenCompass(); }
+    // iOS — foydalanuvchi tugma bosishi kerak, keyin so'raladi
+    DeviceOrientationEvent.requestPermission()
+      .then(r => {
+        if (r === 'granted') {
+          listenCompass();
+        } else {
+          document.getElementById('qiblaStatus').textContent = '❌ Kompas ruxsati rad etildi. Sozlamalarda ruxsat bering.';
+          showToast('❌ Kompas ruxsati kerak');
+        }
+      })
+      .catch(err => {
+        // Ruxsat so'rash muvaffaqiyatsiz bo'lsa ham urinib ko'ramiz
+        listenCompass();
+      });
+  } else {
+    // Android va boshqa qurilmalar — ruxsat so'rash shart emas
+    listenCompass();
+  }
 }
 
 function listenCompass() {
   if (watchingCompass) return;
   watchingCompass = true;
-  // iOS da deviceorientationabsolute yo'q, shuning uchun deviceorientation ishlatamiz
-  // Android da absolute ishlatamiz
   const hasAbsolute = 'ondeviceorientationabsolute' in window;
   if (hasAbsolute) {
     window.addEventListener('deviceorientationabsolute', handleOrient, true);
   }
   window.addEventListener('deviceorientation', handleOrient, true);
-  document.getElementById('qiblaStatus').textContent = '🔄 Telefonni ushlab yuring — kompas ishlayapti';
+  document.getElementById('qiblaStatus').textContent = '🔄 Telefonni sekin aylantiring — kompas ishlayapti';
 }
 
 let lastVibrated = 0;
@@ -2262,6 +2434,149 @@ function checkJuma() {
     <div style="font-family:var(--arabic);font-size:22px;color:rgba(255,255,255,0.85)">جُمُعَة</div>`;
   pstrip.insertAdjacentElement('beforebegin', div);
 }
+
+// ===== HADISLAR =====
+const HADIS_SOURCES = [
+  { id:'bukhari', name:'Sahih Buxoriy', ar:'صحيح البخاري', icon:'📗', color:'#0b5e35', total:7563 },
+  { id:'muslim', name:'Sahih Muslim', ar:'صحيح مسلم', icon:'📘', color:'#185FA5', total:3033 },
+  { id:'abudawud', name:'Abu Dovud', ar:'سنن أبي داود', icon:'📙', color:'#854F0B', total:5274 },
+  { id:'tirmidhi', name:'Termiziy', ar:'سنن الترمذي', icon:'📕', color:'#A32D2D', total:3956 },
+];
+
+let currentHadisData = null;
+let savedHadises = JSON.parse(localStorage.getItem('saved_hadis') || '[]');
+
+const HADIS_UZ = [
+  { ar:'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ', uz:'Albatta, amallar niyatlarga qarab (baholanadi). Har bir kishiga niyat qilgani beriladi.', src:'Buxoriy 1' },
+  { ar:'الدِّينُ النَّصِيحَةُ', uz:"Din — nasihatdir. Alloh uchun, Uning Kitobi uchun, Payg'ambari uchun, musulmonlar imomlarи va ommasi uchun.", src:'Muslim 55' },
+  { ar:'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ', uz:"Allohga va oxirat kuniga ishongan kishi yaxshi so'z so'zlasin yoki jim tursin.", src:'Buxoriy 6018' },
+  { ar:'لا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ', uz:"Biringiz o'zi uchun yaxshi ko'rgan narsani birodaringiz uchun ham yaxshi ko'rmaguncha haqiqiy mo'min bo'la olmaysiz.", src:'Buxoriy 13' },
+  { ar:'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ', uz:"Musulmon — musulmonlar uning tili va qo'lidan omon bo'lgan kishidir.", src:'Buxoriy 10' },
+  { ar:'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ', uz:"Ilm izlash har bir musulmonga farzdir.", src:'Ibn Moja 224' },
+  { ar:'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ', uz:"Sizlarning eng yaxshingiz Qur'onni o'rganib, uni boshqalarga o'rgatgan kishidir.", src:'Buxoriy 5027' },
+  { ar:'إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ', uz:"Albatta Alloh muloyimdir va muloyimlikni yaxshi ko'radi.", src:'Buxoriy 6927' },
+  { ar:'تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ', uz:"Birodaringizga tabassum qilishingiz sadaqa hisoblanadi.", src:"Termiziy 1956" },
+  { ar:'اتَّقِ اللَّهَ حَيْثُمَا كُنْتَ', uz:"Qaerda bo'lsang ham Allohdan qo'rq, yomonlikdan keyin yaxshilik qil — u yomonlikni o'chiradi, va odamlarga yaxshi xulq bilan muomala qil.", src:"Termiziy 1987" },
+  { ar:'أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ', uz:"Allohga eng sevimli amal — oz bo'lsa ham doimiy bajarilgandir.", src:'Buxoriy 6464' },
+  { ar:'الصَّلَاةُ عِمَادُ الدِّينِ', uz:"Namoz — dinning ustuni. Uni o'qigan dini to'g'ri bo'ladi, uni tark etgan dinini vayron qiladi.", src:"Bayhaqiy" },
+  { ar:'مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ', uz:"Kim Ramazon oyida iymon va savob umidida ro'za tutsa, uning o'tgan gunolari kechiriladi.", src:'Buxoriy 38' },
+  { ar:'إِنَّ اللَّهَ لَا يَنْظُرُ إِلَى صُوَرِكُمْ وَأَمْوَالِكُمْ وَلَكِنْ يَنْظُرُ إِلَى قُلُوبِكُمْ وَأَعْمَالِكُمْ', uz:"Albatta Alloh sizlarning qiyofangizga va mollaringizga qaramaydi, lekin qalblaringizga va amallaringizga qaraydi.", src:'Muslim 2564' },
+  { ar:'خَيْرُ الصَّدَقَةِ مَا كَانَ عَنْ ظَهْرِ غِنًى', uz:"Sadaqaning eng yaxshisi — boylik holatida berilgan sadaqadir.", src:'Buxoriy 1426' },
+  { ar:'رَحِمَ اللَّهُ رَجُلًا سَمْحًا إِذَا بَاعَ وَإِذَا اشْتَرَى وَإِذَا اقْتَضَى', uz:"Alloh sotganda, sotib olganda va qarz so'raganda muloyim bo'lgan kishiga rahm qilsin.", src:'Buxoriy 2076' },
+  { ar:'مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا', uz:"Kim mo'mindan dunyo qayg'ularidan birini daf etsa, Alloh qiyomat kuni undan qayg'ularini daf etadi.", src:'Muslim 2699' },
+  { ar:'الْيَدُ الْعُلْيَا خَيْرٌ مِنَ الْيَدِ السُّفْلَى', uz:"Yuqori qo'l (beruvchi) quyi qo'ldan (oluvchidan) yaxshidir.", src:'Buxoriy 1429' },
+  { ar:'لَيْسَ الشَّدِيدُ بِالصُّرَعَةِ إِنَّمَا الشَّدِيدُ الَّذِي يَمْلِكُ نَفْسَهُ عِنْدَ الْغَضَبِ', uz:"Kuchli kishi palvon emas. Haqiqiy kuchli — g'azab vaqtida nafsini jilovlay olgan kishidir.", src:'Buxoriy 6114' },
+  { ar:'إِنَّ مِنْ أَكْمَلِ الْمُؤْمِنِينَ إِيمَانًا أَحْسَنَهُمْ خُلُقًا', uz:"Mo'minlar ichida imoni eng mukammali — xulqi eng yaxshisi hisoblanadi.", src:'Abu Dovud 4682' },
+];
+
+let currentHadisIdx = -1;
+
+function loadHadis() {
+  // Bugungi hadis indexi
+  const todayKey = 'hadis_today_' + new Date().toDateString();
+  let idx = parseInt(localStorage.getItem(todayKey) || '-1');
+  if (idx < 0) {
+    idx = Math.floor(Date.now() / 86400000) % HADIS_UZ.length;
+    localStorage.setItem(todayKey, idx);
+  }
+  currentHadisIdx = idx;
+  renderHadis(HADIS_UZ[idx]);
+  renderHadisSourceGrid();
+  renderSavedHadises();
+}
+
+function loadNextHadis() {
+  currentHadisIdx = (currentHadisIdx + 1) % HADIS_UZ.length;
+  renderHadis(HADIS_UZ[currentHadisIdx]);
+  showToast('↻ Yangi hadis yuklandi');
+}
+
+function renderHadis(h) {
+  currentHadisData = h;
+  const ar = document.getElementById('hadisArabic');
+  const uz = document.getElementById('hadisUz');
+  const src = document.getElementById('hadisSource');
+  if (!ar || !uz || !src) return;
+  ar.style.opacity = '0';
+  uz.style.opacity = '0';
+  setTimeout(() => {
+    ar.textContent = h.ar;
+    uz.textContent = h.uz;
+    src.textContent = '📚 ' + h.src;
+    ar.style.transition = 'opacity .4s';
+    uz.style.transition = 'opacity .4s';
+    ar.style.opacity = '1';
+    uz.style.opacity = '1';
+  }, 150);
+}
+
+function renderHadisSourceGrid() {
+  const el = document.getElementById('hadisSourceGrid');
+  if (!el) return;
+  el.innerHTML = HADIS_SOURCES.map(s => `
+    <div onclick="loadHadisFromSource('${s.id}')" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:opacity .15s" onmousedown="this.style.opacity=0.7" onmouseup="this.style.opacity=1">
+      <div style="font-size:22px;margin-bottom:4px">${s.icon}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px">${s.name}</div>
+      <div style="font-family:var(--arabic);font-size:13px;color:var(--muted)">${s.ar}</div>
+    </div>`).join('');
+}
+
+function loadHadisFromSource(sourceId) {
+  // Manba bo'yicha tasodifiy hadis tanlash
+  const filtered = HADIS_UZ.filter((h, i) => i % HADIS_SOURCES.length === HADIS_SOURCES.findIndex(s => s.id === sourceId));
+  if (!filtered.length) { showToast('Bu manbadan hadis yuklanmoqda...'); return; }
+  const h = filtered[Math.floor(Math.random() * filtered.length)];
+  currentHadisIdx = HADIS_UZ.indexOf(h);
+  renderHadis(h);
+  showToast('📚 ' + HADIS_SOURCES.find(s => s.id === sourceId)?.name + ' dan hadis');
+}
+
+function copyHadis() {
+  if (!currentHadisData) return;
+  const text = `${currentHadisData.ar}\n\n${currentHadisData.uz}\n\n— ${currentHadisData.src}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('✓ Hadis nusxa olindi')).catch(() => fallbackCopy(text));
+  } else { fallbackCopy(text); }
+}
+
+function saveHadis() {
+  if (!currentHadisData) return;
+  const key = currentHadisData.src;
+  const exists = savedHadises.find(h => h.src === key);
+  if (exists) { showToast('Bu hadis allaqachon saqlangan'); return; }
+  savedHadises.unshift({ ...currentHadisData, t: Date.now() });
+  savedHadises = savedHadises.slice(0, 20);
+  localStorage.setItem('saved_hadis', JSON.stringify(savedHadises));
+  renderSavedHadises();
+  showToast('⭐ Hadis saqlandi');
+}
+
+function renderSavedHadises() {
+  const el = document.getElementById('savedHadisList');
+  if (!el) return;
+  if (!savedHadises.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Hali hadis saqlanmagan</div>';
+    return;
+  }
+  el.innerHTML = savedHadises.slice(0, 5).map((h, i) => `
+    <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--emerald);flex-shrink:0;margin-top:2px">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--arabic);font-size:16px;color:var(--emerald);text-align:right;direction:rtl;margin-bottom:4px">${h.ar.slice(0,60)}${h.ar.length>60?'...':''}</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">${h.uz.slice(0,80)}...</div>
+        <div style="font-size:10px;color:var(--light);margin-top:3px">📚 ${h.src}</div>
+      </div>
+      <button onclick="delSavedHadis(${i})" style="background:none;border:none;color:var(--light);cursor:pointer;font-size:16px;padding:2px;flex-shrink:0">✕</button>
+    </div>`).join('');
+}
+
+function delSavedHadis(idx) {
+  savedHadises.splice(idx, 1);
+  localStorage.setItem('saved_hadis', JSON.stringify(savedHadises));
+  renderSavedHadises();
+  showToast("O'chirildi");
+}
+
 
 // ===== INIT =====
 loadSurahs();
