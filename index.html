@@ -195,7 +195,7 @@ body{display:flex;flex-direction:column}
 /* READER */
 .reader{display:none;position:absolute;inset:0;background:var(--bg);z-index:50;overflow-y:auto;padding-bottom:120px}
 .reader.open{display:block}
-.reader-hdr{position:sticky;top:0;background:var(--emerald);padding:calc(env(safe-area-inset-top, 0px) + 85px) 16px 12px 16px;display:flex;align-items:center;gap:12px;z-index:5}
+.reader-hdr{position:sticky;top:0;background:var(--emerald);padding:calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px 16px;display:flex;align-items:center;gap:12px;z-index:5}
 .reader-back{background:rgba(255,255,255,0.18);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:18px;flex-shrink:0}
 .reader-titles{flex:1}
 .reader-name{color:#fff;font-family:var(--serif);font-size:17px}
@@ -281,6 +281,18 @@ body{display:flex;flex-direction:column}
 .qibla-status{font-size:13px;color:var(--muted);text-align:center;padding:0 20px;margin-bottom:16px;min-height:36px}
 .qibla-acc{font-size:11px;color:var(--light);text-align:center;margin-bottom:12px}
 
+/* Qibla aligned pulse */
+@keyframes qalignPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(11,94,53,0.7), 0 4px 28px rgba(11,94,53,0.3); }
+  50%  { box-shadow: 0 0 0 18px rgba(11,94,53,0), 0 4px 28px rgba(11,94,53,0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(11,94,53,0), 0 4px 28px rgba(11,94,53,0.3); }
+}
+@keyframes qgoldGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,145,58,0.8); }
+  50%     { box-shadow: 0 0 0 14px rgba(200,145,58,0); }
+}
+.compass-aligned { animation: qalignPulse 1.2s ease infinite !important; border-color: var(--emerald) !important; }
+
 /* CALIBRATE ring animation */
 @keyframes calibrate{0%,100%{transform:rotate(0deg)}25%{transform:rotate(90deg)}50%{transform:rotate(180deg)}75%{transform:rotate(270deg)}}
 .calibrating .compass-outer{animation:calibrate 3s linear infinite}
@@ -335,7 +347,12 @@ body{display:flex;flex-direction:column}
 .rs-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)}
 .rs-heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:8px 0 16px}
 .rs-hm-cell{aspect-ratio:1;border-radius:4px;background:var(--bg2)}
-
+/* Route animation */
+@keyframes routeDash { to { stroke-dashoffset: 0; } }
+.route-animated { stroke-dasharray: 20; stroke-dashoffset: 1000; animation: routeDash 2s linear forwards; }
+@keyframes blink { 0%,100%{transform:scale(1)}50%{transform:scale(1.2)} }
+.leaflet-popup-content-wrapper { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: 12px !important; box-shadow: var(--shadow) !important; padding: 6px 12px !important; }
+.leaflet-popup-tip { background: var(--card) !important; }
 /* Scroll bar */
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -435,6 +452,14 @@ body{display:flex;flex-direction:column}
     <div class="qcard" onclick="navTo('readstats')">
       <div class="qcard-icon">📊</div>
       <div class="qcard-label">Statistika</div>
+    </div>
+    <div class="qcard" onclick="navTo('namoz')">
+      <div class="qcard-icon">🕌</div>
+      <div class="qcard-label">Namoz</div>
+    </div>
+    <div class="qcard" onclick="navTo('zakat')">
+      <div class="qcard-icon">💰</div>
+      <div class="qcard-label">Zakat</div>
     </div>
   </div>
   <div class="qsection">
@@ -671,20 +696,25 @@ body{display:flex;flex-direction:column}
     <div class="qibla-icon">🕋</div>
     <div class="qibla-title">Qibla Yo'nalishi</div>
     <div class="compass-outer" id="compassOuter">
-      <div class="compass-rose"></div>
-      <span class="cdir cn">S</span>
-      <span class="cdir cs">J</span>
-      <span class="cdir ce">Sh</span>
-      <span class="cdir cw">G'</span>
-      <div style="position:absolute;top:50%;left:50%;width:0;height:0">
-        <div id="qiblaArm" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform 0.4s cubic-bezier(.25,.46,.45,.94)">
-          <div class="qneedle" style="width:4px;height:108px;border-radius:3px 3px 0 0;background:linear-gradient(to bottom,var(--gold) 0%,var(--gold) 50%,var(--emerald) 50%);margin:0 auto"></div>
+      <canvas id="compassCanvas" width="260" height="260" style="position:absolute;inset:0;border-radius:50%"></canvas>
+      <div style="position:absolute;top:50%;left:50%;width:0;height:0;z-index:5">
+        <div id="qiblaArm" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform 0.35s cubic-bezier(.25,.46,.45,.94)">
+          <div id="qneedle" style="width:6px;height:110px;border-radius:4px 4px 0 0;margin:0 auto;background:linear-gradient(to bottom,#c8913a 0%,#c8913a 50%,#137040 50%);box-shadow:0 2px 12px rgba(0,0,0,0.25)"></div>
         </div>
       </div>
-      <div class="qcenter"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;width:20px;height:20px;border-radius:50%;background:var(--emerald);border:3px solid #fff;box-shadow:0 2px 8px rgba(11,94,53,0.4)"></div>
+      <!-- Yo'nalish harflari -->
+      <span style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:800;color:var(--emerald)">S</span>
+      <span style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:700;color:var(--muted)">J</span>
+      <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--muted)">Sh</span>
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--muted)">G'</span>
+      <!-- Qibla yo'nalishi ko'rsatkichi (tashqi halqa) -->
+      <div id="qiblaTargetDot" style="position:absolute;top:50%;left:50%;width:0;height:0;z-index:4;display:none">
+        <div style="position:absolute;bottom:118px;left:-7px;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px rgba(200,145,58,0.8)"></div>
+      </div>
     </div>
-    <div class="qibla-deg" id="qiblaDeg">-- °</div>
     <div class="qibla-label">Qibla burchagi (shimoldan)</div>
+    <div class="qibla-deg" id="qiblaDeg">-- °</div>
     <div class="qibla-status" id="qiblaStatus">Qiblani topish uchun tugmani bosing</div>
     <div class="qibla-acc" id="qiblaAcc"></div>
     <button class="loc-btn" style="max-width:280px;margin-top:4px" id="qiblaBtn" onclick="startQiblaFlow()">
@@ -774,6 +804,99 @@ body{display:flex;flex-direction:column}
   </div>
 </div>
 
+
+<!-- NAMOZ -->
+<div class="page" id="page-namoz">
+  <div style="background:var(--emerald);padding:20px 16px 16px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+    <div style="font-family:var(--arabic);font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:6px;text-align:right">الصَّلَاةُ عِمَادُ الدِّينِ</div>
+    <div style="font-family:var(--serif);font-size:20px;color:#fff">Namoz Rakatlar</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px">Har bir namozning rakatlar soni</div>
+  </div>
+  <div style="margin:14px">
+    <!-- Namoz jurnali tugmalari -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:12px">📅 Bugun o'qilgan namozlar</div>
+      <div id="namozJournalBtns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <!-- Rakatlar jadvali -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:12px">📖 Rakatlar jadvali</div>
+      <div id="namozRakatList"></div>
+    </div>
+    <!-- Haftalik statistika -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:12px">📊 Haftalik statistika</div>
+      <div id="namozWeekChart" style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:8px"></div>
+      <div id="namozWeekLabels" style="display:flex;gap:4px;justify-content:space-around"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ZAKAT -->
+<div class="page" id="page-zakat">
+  <div style="background:var(--emerald);padding:20px 16px 16px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+    <div style="font-family:var(--arabic);font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:6px;text-align:right">وَأَقِيمُوا الصَّلَاةَ وَآتُوا الزَّكَاةَ</div>
+    <div style="font-family:var(--serif);font-size:20px;color:#fff">Zakat Kalkulyatori</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px">Nisob va zakat miqdorini hisoblang</div>
+  </div>
+  <div style="margin:14px">
+    <!-- Nisob ma'lumoti -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:10px">📋 Nisob haqida</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:8px">Zakat farz bo'lishi uchun mol-mulk <b>nisob</b> miqdoridan oshishi va <b>1 yil</b> (haval) o'tishi kerak.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">🥇 Oltin nisobi</div>
+          <div style="font-size:15px;font-weight:700;color:var(--gold)">85 g</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">🥈 Kumush nisobi</div>
+          <div style="font-size:15px;font-weight:700;color:var(--muted)">595 g</div>
+        </div>
+      </div>
+    </div>
+    <!-- Hisoblash -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)">
+      <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted);margin-bottom:14px">🧮 Zakat hisoblash</div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Naqd pul (so'm)</label>
+        <input type="number" id="zakatNaqd" placeholder="0" oninput="calcZakat()" style="width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--ui);font-size:14px;outline:none">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Oltin (gram)</label>
+        <input type="number" id="zakatOltin" placeholder="0" oninput="calcZakat()" style="width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--ui);font-size:14px;outline:none">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Kumush (gram)</label>
+        <input type="number" id="zakatKumush" placeholder="0" oninput="calcZakat()" style="width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--ui);font-size:14px;outline:none">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">1 gram oltin narxi (so'm)</label>
+        <input type="number" id="zakatOltinNarx" placeholder="900000" oninput="calcZakat()" style="width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--ui);font-size:14px;outline:none">
+      </div>
+      <!-- Natija -->
+      <div id="zakatResult" style="background:var(--emerald);border-radius:12px;padding:16px;text-align:center;display:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:6px">2.5% — Zakat miqdori</div>
+        <div id="zakatAmount" style="font-family:var(--serif);font-size:28px;color:#fff;margin-bottom:4px">0 so'm</div>
+        <div id="zakatStatus" style="font-size:12px;color:rgba(255,255,255,0.8)"></div>
+      </div>
+      <div id="zakatResultEmpty" style="background:var(--bg2);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:13px;color:var(--muted)">Yuqoridagi maydonlarni to'ldiring</div>
+      </div>
+    </div>
+    <!-- Saqlangan zakat -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted)">📝 Zakat tarixi</div>
+        <button onclick="saveZakat()" style="background:var(--emerald);border:none;color:#fff;border-radius:8px;padding:5px 12px;font-family:var(--ui);font-size:11px;font-weight:600;cursor:pointer">💾 Saqlash</button>
+      </div>
+      <div id="zakatHistory"></div>
+    </div>
+  </div>
+</div>
+
 <!-- DUAS -->
 <div class="page" id="page-duas">
   <div class="stitle">Duolar va Zikrlar</div>
@@ -827,16 +950,29 @@ body{display:flex;flex-direction:column}
 <div class="mmodal-overlay" id="mModal">
   <div class="mmodal">
     <div class="mmodal-handle"></div>
-    <div class="mmodal-name" id="mModalName">--</div>
-    <div class="mmodal-addr" id="mModalAddr">--</div>
-    <div class="mmodal-btns">
-    <button class="mmodal-btn primary" onclick="openRoute()">
-    🗺️ Yo'l ko'rsatish
-    </button>
-    <button class="mmodal-btn secondary" onclick="closeMModal()">
-    ✕ Yopish
-    </button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+      <div id="mModalImg" style="width:56px;height:56px;border-radius:12px;background:var(--emerald);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden"></div>
+      <div style="flex:1">
+        <div class="mmodal-name" id="mModalName">--</div>
+        <div class="mmodal-addr" id="mModalAddr">--</div>
+      </div>
     </div>
+    <div id="mModalMeta" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"></div>
+    <div class="mmodal-btns" style="margin-bottom:0">
+      <button class="mmodal-btn primary" onclick="openRoute('foot')" id="btnFoot">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4a1 1 0 1 0 2 0 1 1 0 0 0-2 0M7 20l3-6 3 3 2-4 3 5"/></svg>
+        Piyoda
+      </button>
+      <button class="mmodal-btn" onclick="openRoute('cycling')" id="btnBike" style="background:rgba(200,145,58,0.12);color:var(--gold);border:1px solid rgba(200,145,58,0.3)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="18" r="3"/><circle cx="19" cy="18" r="3"/><path d="M12 2l3 7H9l3-5M5 18l3-7h8l2 4"/></svg>
+        Velosiped
+      </button>
+      <button class="mmodal-btn" onclick="openRoute('driving')" id="btnCar" style="background:rgba(11,94,53,0.08);color:var(--emerald);border:1px solid var(--border)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="9" width="22" height="11" rx="2"/><path d="M16 9V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4M1 14h22"/><circle cx="7" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg>
+        Mashina
+      </button>
+    </div>
+    <button class="mmodal-btn secondary" onclick="closeMModal()" style="width:100%;margin-top:8px">✕ Yopish</button>
   </div>
 </div>
 
@@ -949,7 +1085,7 @@ function toggleWeekly() {
 }
 
 // ===== NAV =====
-const PAGES = ['home','quran','mosque','tasbeh','qibla','duas','readstats','hadis'];
+const PAGES = ['home','quran','mosque','tasbeh','qibla','duas','readstats','hadis','namoz','zakat'];
 function navTo(name) {
   PAGES.forEach(p => {
     const pg = document.getElementById('page-'+p);
@@ -975,6 +1111,13 @@ function navTo(name) {
   }
   if (name === 'hadis') {
     loadHadis();
+  }
+  if (name === 'namoz') {
+    renderNamozPage();
+  }
+  if (name === 'zakat') {
+    renderZakatHistory();
+    calcZakat();
   }
 }
 
@@ -1248,14 +1391,24 @@ function findNearbyMosques() {
             const distM = calcDist(userLat, userLon, lat, lon);
             const name = el.tags?.name || el.tags?.['name:uz'] || el.tags?.['name:ru'] || 'Masjid';
             
+            // OpenStreetMap Wikimedia rasm
+            const wikimediaImg = el.tags?.image || el.tags?.['wikimedia_commons'] || null;
+            let photo = null;
+            if (wikimediaImg && wikimediaImg.startsWith('http')) {
+              photo = wikimediaImg;
+            }
+            
             return {
               name,
-              addr: el.tags?.['addr:street'] || el.tags?.['addr:full'] || 'Manzil aniqlanmagan',
+              addr: el.tags?.['addr:street'] || el.tags?.['addr:full'] || el.tags?.['addr:city'] || 'Manzil aniqlanmagan',
               lat,
               lon,
               distM,
               dist: formatDist(distM),
-              mins: formatMin(distM)
+              mins: formatMin(distM),
+              photo,
+              osmId: el.id,
+              tags: el.tags || {}
             };
           }).filter(m => m !== null).sort((a,b) => a.distM - b.distM);
           
@@ -1340,7 +1493,31 @@ function buildMap() {
 function openMosqueModal(m) {
   selectedMosque = m;
   document.getElementById('mModalName').textContent = m.name;
-  document.getElementById('mModalAddr').textContent = m.addr + (m.dist ? ' · 🚶 '+m.dist+(m.mins?' ('+m.mins+')':'') : '');
+  document.getElementById('mModalAddr').textContent = m.addr;
+
+  // Rasm
+  const imgEl = document.getElementById('mModalImg');
+  if (m.photo) {
+    imgEl.innerHTML = `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">`;
+  } else {
+    imgEl.innerHTML = '🕌';
+  }
+
+  // Meta: masofa va vaqtlar
+  const metaEl = document.getElementById('mModalMeta');
+  if (m.distM) {
+    const walkMin = Math.round(m.distM / 80);
+    const bikeMin = Math.round(m.distM / 250);
+    const carMin = Math.round(m.distM / 600);
+    metaEl.innerHTML = `
+      <span style="font-size:11px;background:var(--bg2);padding:4px 10px;border-radius:20px;color:var(--muted)">📍 ${m.dist}</span>
+      <span style="font-size:11px;background:var(--bg2);padding:4px 10px;border-radius:20px;color:var(--muted)">🚶 ~${walkMin} daq</span>
+      <span style="font-size:11px;background:var(--bg2);padding:4px 10px;border-radius:20px;color:var(--muted)">🚲 ~${bikeMin} daq</span>
+      <span style="font-size:11px;background:var(--bg2);padding:4px 10px;border-radius:20px;color:var(--muted)">🚗 ~${carMin} daq</span>`;
+  } else {
+    metaEl.innerHTML = '';
+  }
+
   document.getElementById('mModal').classList.add('open');
   if (leafletMap) leafletMap.setView([m.lat, m.lon], 16);
 }
@@ -1349,29 +1526,147 @@ function openMosqueModal(m) {
 function closeMModal() { document.getElementById('mModal').classList.remove('open'); }
 document.getElementById('mModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeMModal(); });
 
-function openRoute() {
+// Route audio context
+let routeAudioCtx = null;
+function getRouteAudioCtx() {
+  if (!routeAudioCtx) routeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return routeAudioCtx;
+}
+
+function playRouteSound(mode) {
+  try {
+    const ctx = getRouteAudioCtx();
+    if (mode === 'foot') {
+      // Piyoda — yengilgina qadamlar tovushi
+      [0, 120, 240].forEach(delay => {
+        setTimeout(() => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(200, ctx.currentTime);
+          o.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.08);
+          g.gain.setValueAtTime(0.06, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+          o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.1);
+        }, delay);
+      });
+    } else if (mode === 'cycling') {
+      // Velosiped — g'ildirak zvoni
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(880, ctx.currentTime);
+      o.frequency.setValueAtTime(1100, ctx.currentTime + 0.08);
+      o.frequency.setValueAtTime(880, ctx.currentTime + 0.16);
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3);
+    } else if (mode === 'driving') {
+      // Mashina — engine start tovushi
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(80, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.2);
+      o.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.4);
+      g.gain.setValueAtTime(0.08, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.45);
+    }
+  } catch(e) {}
+}
+
+function openRoute(mode = 'foot') {
   if (!selectedMosque || !leafletMap) return;
   closeMModal();
-  if (routeLayer) { leafletMap.removeLayer(routeLayer); routeLayer=null; }
-  const {lat, lon} = selectedMosque;
+  if (routeLayer) { leafletMap.removeLayer(routeLayer); routeLayer = null; }
+
+  const { lat, lon, name } = selectedMosque;
   const fromLat = userLat || lat;
   const fromLon = userLon || lon;
-  // OSRM route chizish
-  fetch(`https://router.project-osrm.org/route/v1/foot/${fromLon},${fromLat};${lon},${lat}?overview=full&geometries=geojson`)
-    .then(r=>r.json())
-    .then(d=>{
-      if(d.routes && d.routes[0]) {
-        const coords = d.routes[0].geometry;
-        routeLayer = L.geoJSON(coords, {
-          style:{ color:'#137040', weight:5, opacity:0.85, dashArray:'8,6', lineCap:'round' }
-        }).addTo(leafletMap);
-        leafletMap.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
-        const distM = d.routes[0].distance;
-        const minWalk = Math.round(distM/80);
-        showToast(`🚶 ${formatDist(distM)} · ~${minWalk} daqiqa`);
+
+  // Transport rejimi
+  const profiles = { foot: 'foot', cycling: 'bike', driving: 'car' };
+  const profile = profiles[mode] || 'foot';
+
+  const icons = { foot: '🚶', cycling: '🚲', driving: '🚗' };
+  const speeds = { foot: 80, cycling: 250, driving: 600 };
+  const colors = { foot: '#137040', cycling: '#c8913a', driving: '#185FA5' };
+  const dashArrays = { foot: '8,6', cycling: '12,4', driving: null };
+
+  showToast('🗺️ Yo\'l hisoblanmoqda...');
+  playRouteSound(mode);
+
+  fetch(`https://router.project-osrm.org/route/v1/${profile}/${fromLon},${fromLat};${lon},${lat}?overview=full&geometries=geojson&steps=false`)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.routes || !d.routes[0]) { showToast('❌ Yo\'l topilmadi'); return; }
+
+      const coords = d.routes[0].geometry;
+      const distM = d.routes[0].distance;
+      const durSec = d.routes[0].duration;
+      const mins = Math.round(durSec / 60);
+
+      // Animatsiyali yo'l chizish
+      const routeStyle = {
+        color: colors[mode],
+        weight: mode === 'driving' ? 6 : 5,
+        opacity: 0,
+        lineCap: 'round',
+        lineJoin: 'round'
+      };
+      if (dashArrays[mode]) routeStyle.dashArray = dashArrays[mode];
+
+      routeLayer = L.geoJSON(coords, { style: routeStyle }).addTo(leafletMap);
+
+      // Fade-in + dash animatsiyasi
+      let opacity = 0;
+      const fadeIn = setInterval(() => {
+        opacity = Math.min(opacity + 0.08, mode === 'driving' ? 0.9 : 0.85);
+        routeLayer.setStyle({ opacity });
+        if (opacity >= (mode === 'driving' ? 0.9 : 0.85)) clearInterval(fadeIn);
+      }, 30);
+
+      // Marker animatsiya
+      const destIcon = L.divIcon({
+        className: '',
+        html: `<div style="background:${colors[mode]};color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(0,0,0,0.4);border:3px solid #fff;animation:blink 1s ease 3">🕌</div>`,
+        iconSize: [40, 40], iconAnchor: [20, 40]
+      });
+
+      // Bosh nuqta (foydalanuvchi)
+      const startIcon = L.divIcon({
+        className: '',
+        html: `<div style="background:${colors[mode]};width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px ${colors[mode]}44"></div>`,
+        iconSize: [14, 14], iconAnchor: [7, 7]
+      });
+      L.marker([fromLat, fromLon], { icon: startIcon }).addTo(leafletMap);
+
+      leafletMap.fitBounds(routeLayer.getBounds(), { padding: [50, 50], animate: true, duration: 0.8 });
+
+      // Info panel
+      setTimeout(() => {
+        showToast(`${icons[mode]} ${formatDist(distM)} · ~${mins} daqiqa · ${name.slice(0, 20)}`);
+        // Ovoz
+        playRouteSound(mode);
+      }, 600);
+
+      // Xaritada info kartochka
+      const midIdx = Math.floor(coords.coordinates.length / 2);
+      const midPt = coords.coordinates[midIdx];
+      if (midPt) {
+        L.popup({ closeButton: false, className: 'route-popup', offset: [0, -5] })
+          .setLatLng([midPt[1], midPt[0]])
+          .setContent(`<div style="font-family:var(--ui);font-size:12px;font-weight:600;color:${colors[mode]};white-space:nowrap">${icons[mode]} ${formatDist(distM)} · ~${mins} daq</div>`)
+          .addTo(leafletMap);
       }
     })
-    .catch(()=>showToast('Yo\'l chizishda xatolik'));
+    .catch(() => {
+      showToast('❌ Yo\'l chizishda xatolik');
+    });
 }
 
 // ===== QURAN =====
@@ -1524,9 +1819,9 @@ async function openSurah(num, jumpToAyah) {
         <div class="ayah-arabic" id="ar-text-${a.numberInSurah}">${arabicHTML} <span class="ayah-badge">${a.numberInSurah}</span></div>
         ${tr ? `<div class="ayah-uz">${tr}</div>` : ''}
         <div class="ayah-acts">
-          <button class="aact" onclick="playAyah(${num},${a.numberInSurah})">▶ Tinglash</button>
-          <button class="aact" onclick="bmAyahEl(this)">♥ Saqlash</button>
-          <button class="aact" onclick="copyAyahEl(this)">⧉ Nusxa</button>
+          <button class="aact" onclick="playAyah(${num},${a.numberInSurah})"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Tinglash</button>
+          <button class="aact" onclick="bmAyahEl(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Saqlash</button>
+          <button class="aact" onclick="copyAyahEl(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Nusxa</button>
         </div>
       </div>`;
     }).join('');
@@ -1977,9 +2272,10 @@ function listenCompass() {
 }
 
 let lastVibrated = 0;
+let qSmooth = null;
+
 function handleOrient(e) {
   let heading = null;
-  // iOS Safari: webkitCompassHeading eng ishonchli
   if (e.webkitCompassHeading != null && e.webkitCompassHeading !== 0) {
     heading = e.webkitCompassHeading;
   } else if (e.absolute === true && e.alpha !== null) {
@@ -1988,28 +2284,124 @@ function handleOrient(e) {
     heading = (360 - e.alpha + 360) % 360;
   }
   if (heading === null) return;
-  // Smooth filtering — titroqni kamaytirish
-  if (deviceOrient === 0) { deviceOrient = heading; }
-  else { deviceOrient = deviceOrient * 0.85 + heading * 0.15; }
-  const needle = qAngle - deviceOrient;
+
+  // Smooth filter
+  if (qSmooth === null) { qSmooth = heading; }
+  else {
+    // Burchak o'tishida 360/0 muammosi
+    let delta = heading - qSmooth;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    qSmooth += delta * 0.18;
+    qSmooth = ((qSmooth % 360) + 360) % 360;
+  }
+
+  const needle = qAngle - qSmooth;
   document.getElementById('qiblaArm').style.transform = `translateX(-50%) rotate(${needle}deg)`;
+
   const diff = ((needle % 360) + 360) % 360;
-  const aligned = diff < 10 || diff > 350;
+  const aligned = diff < 8 || diff > 352;
+  const compassOuter = document.getElementById('compassOuter');
+  const statusEl = document.getElementById('qiblaStatus');
   const now = Date.now();
+
+  // Canvas orqa fon chizish
+  drawCompassCanvas(qSmooth, qAngle);
+
   if (aligned) {
-    document.getElementById('qiblaStatus').textContent = '✅ Siz Qibla tomon turibsiz!';
-    document.getElementById('qiblaStatus').style.color = 'var(--emerald)';
-    // Har 3 sekundda bir marta vibrate
-    if (now - lastVibrated > 3000) {
-      if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+    statusEl.textContent = '✅ Siz Qibla tomon turibsiz!';
+    statusEl.style.color = 'var(--emerald)';
+    statusEl.style.fontWeight = '700';
+    compassOuter.classList.add('compass-aligned');
+    document.getElementById('qneedle').style.boxShadow = '0 0 16px rgba(200,145,58,0.9), 0 2px 8px rgba(0,0,0,0.2)';
+    document.getElementById('qneedle').style.background = 'linear-gradient(to bottom,#fcd97a 0%,#c8913a 50%,#27c070 50%)';
+    if (now - lastVibrated > 2000) {
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
       lastVibrated = now;
     }
   } else {
+    compassOuter.classList.remove('compass-aligned');
+    document.getElementById('qneedle').style.boxShadow = '0 2px 12px rgba(0,0,0,0.25)';
+    document.getElementById('qneedle').style.background = 'linear-gradient(to bottom,#c8913a 0%,#c8913a 50%,#137040 50%)';
+    statusEl.style.fontWeight = '400';
+    statusEl.style.color = '';
     const turnDeg = Math.round(diff < 180 ? diff : 360 - diff);
-    const dir = diff < 180 ? '➡️' : '⬅️';
-    document.getElementById('qiblaStatus').textContent = `${dir} ${turnDeg}° buriling — Qibla ${Math.round(qAngle)}°`;
-    document.getElementById('qiblaStatus').style.color = '';
+    const dir = diff < 180 ? '➡️ O\'ngga' : '⬅️ Chapga';
+    statusEl.textContent = `${dir} buriling — ${turnDeg}° qoldi`;
   }
+}
+
+function drawCompassCanvas(deviceHeading, qiblaAngle) {
+  const canvas = document.getElementById('compassCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = 260, H = 260, cx = 130, cy = 130, r = 124;
+  const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
+  ctx.clearRect(0, 0, W, H);
+
+  // Tashqi halqa
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = isDarkNow ? 'rgba(29,154,90,0.3)' : 'rgba(11,94,53,0.15)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Gradient fon (yo'nalish bo'yicha)
+  const grd = ctx.createRadialGradient(cx, cy, 30, cx, cy, r);
+  grd.addColorStop(0, isDarkNow ? 'rgba(26,34,24,0)' : 'rgba(242,237,228,0)');
+  grd.addColorStop(1, isDarkNow ? 'rgba(11,94,53,0.06)' : 'rgba(11,94,53,0.04)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // Gradus chiziqlari (ticks)
+  for (let deg = 0; deg < 360; deg += 5) {
+    const isMajor = deg % 45 === 0;
+    const isMid = deg % 15 === 0;
+    const rad = (deg - deviceHeading) * Math.PI / 180;
+    const len = isMajor ? 14 : (isMid ? 9 : 5);
+    const x1 = cx + (r - 2) * Math.sin(rad);
+    const y1 = cy - (r - 2) * Math.cos(rad);
+    const x2 = cx + (r - 2 - len) * Math.sin(rad);
+    const y2 = cy - (r - 2 - len) * Math.cos(rad);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = isMajor
+      ? (isDarkNow ? 'rgba(200,145,58,0.8)' : 'rgba(200,145,58,0.9)')
+      : (isDarkNow ? 'rgba(138,144,132,0.4)' : 'rgba(107,111,101,0.3)');
+    ctx.lineWidth = isMajor ? 2.5 : 1;
+    ctx.stroke();
+  }
+
+  // Qibla yo'nalishi — oltin nuqta halqada
+  const qRad = (qiblaAngle - deviceHeading) * Math.PI / 180;
+  const qx = cx + (r - 14) * Math.sin(qRad);
+  const qy = cy - (r - 14) * Math.cos(qRad);
+  // Qibla nuri
+  const gradient = ctx.createRadialGradient(qx, qy, 0, qx, qy, 18);
+  gradient.addColorStop(0, 'rgba(200,145,58,0.5)');
+  gradient.addColorStop(1, 'rgba(200,145,58,0)');
+  ctx.beginPath();
+  ctx.arc(qx, qy, 18, 0, Math.PI * 2);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  // Qibla nuqtasi
+  ctx.beginPath();
+  ctx.arc(qx, qy, 7, 0, Math.PI * 2);
+  ctx.fillStyle = '#c8913a';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(qx, qy, 7, 0, Math.PI * 2);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // Ka'ba emoji
+  ctx.font = '11px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🕋', qx, qy);
 }
 
 // ===== DUAS =====
@@ -2575,6 +2967,260 @@ function delSavedHadis(idx) {
   localStorage.setItem('saved_hadis', JSON.stringify(savedHadises));
   renderSavedHadises();
   showToast("O'chirildi");
+}
+
+
+// ===== O'QISH STATISTIKASI =====
+function renderReadStats() {
+  try {
+    // Suralar soni
+    const bms = JSON.parse(localStorage.getItem('bm_v2') || '[]');
+    const savedSurahs = [...new Set(bms.map(b => b.sn))].length;
+    const savedAyahs = bms.filter(b => b.type === 'ayah').length;
+    
+    // Streak hisoblash
+    const tasbehStats = JSON.parse(localStorage.getItem('tasbeh_stats') || '{}');
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toDateString();
+      if (tasbehStats[key] || (i === 0)) {
+        if (tasbehStats[key]) streak++;
+        else if (i > 0) break;
+      } else break;
+    }
+
+    const rsTotalSurahs = document.getElementById('rs-total-surahs');
+    const rsTotalAyahs = document.getElementById('rs-total-ayahs');
+    const rsStreak = document.getElementById('rs-streak');
+    const srNum = document.getElementById('srNum');
+    const srProg = document.getElementById('srProg');
+
+    if (rsTotalSurahs) rsTotalSurahs.textContent = savedSurahs;
+    if (rsTotalAyahs) rsTotalAyahs.textContent = savedAyahs;
+    if (rsStreak) rsStreak.textContent = streak + '🔥';
+    if (srNum) srNum.textContent = streak;
+
+    // Streak ring (maqsad: 30 kun)
+    if (srProg) {
+      const circ = 2 * Math.PI * 70; // r=70
+      const offset = circ - Math.min(1, streak / 30) * circ;
+      srProg.style.strokeDasharray = circ;
+      srProg.style.strokeDashoffset = offset;
+    }
+
+    // Heatmap (so'nggi 28 kun)
+    const heatEl = document.getElementById('rsHeatmap');
+    if (heatEl) {
+      let cells = '';
+      for (let i = 27; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toDateString();
+        const val = tasbehStats[key] || 0;
+        const bg = val === 0 ? 'var(--bg2)' : val < 10 ? 'rgba(29,154,90,0.35)' : 'var(--emerald)';
+        cells += `<div style="aspect-ratio:1;border-radius:4px;background:${bg};title='${key}: ${val}'"></div>`;
+      }
+      heatEl.innerHTML = cells;
+    }
+
+    // Oxirgi o'qilgan suralar
+    const recentEl = document.getElementById('rsRecentList');
+    if (recentEl) {
+      const lr = JSON.parse(localStorage.getItem('last_read') || 'null');
+      const ayahBms = bms.filter(b => b.type === 'ayah').slice(0, 5);
+      if (!lr && !ayahBms.length) {
+        recentEl.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Hali sura o\'qilmagan</div>';
+      } else {
+        let html = '';
+        if (lr) {
+          html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--emerald);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0">📖</div>
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:14px;color:var(--text)">${lr.name}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">${new Date(lr.t).toLocaleDateString('uz-UZ',{day:'numeric',month:'long'})}</div>
+            </div>
+          </div>`;
+        }
+        ayahBms.forEach(b => {
+          html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--emerald);flex-shrink:0">${b.sn}</div>
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:13px;color:var(--text)">${b.sname} ${b.sn}:${b.an}</div>
+              <div style="font-family:var(--arabic);font-size:14px;color:var(--muted);direction:rtl;text-align:right">${(b.arabic||'').slice(0,30)}...</div>
+            </div>
+          </div>`;
+        });
+        recentEl.innerHTML = html;
+      }
+    }
+  } catch(e) {
+    console.error('renderReadStats xatosi:', e);
+  }
+}
+
+
+// ===== NAMOZ SAHIFASI =====
+const NAMOZ_RAKATLAR = [
+  { name:'Bomdod', farz:2, sunnat:2, total:4, arabicName:'الفجر', color:'#1d9a5a' },
+  { name:'Peshin', farz:4, sunnat:4, nafl:2, total:12, arabicName:'الظهر', color:'#137040' },
+  { name:'Asr', farz:4, sunnat:4, total:8, arabicName:'العصر', color:'#0b5e35' },
+  { name:'Shom', farz:3, sunnat:2, nafl:2, total:7, arabicName:'المغرب', color:'#c8913a' },
+  { name:'Xufton', farz:4, sunnat:2, vitr:3, total:17, arabicName:'العشاء', color:'#0b5e35' },
+];
+
+function renderNamozPage() {
+  // Jurnal tugmalari
+  const data = getPJData();
+  const today = new Date().toDateString();
+  const todayArr = data[today] || [false,false,false,false,false,false];
+  const btnsEl = document.getElementById('namozJournalBtns');
+  if (btnsEl) {
+    btnsEl.innerHTML = pNames.map((n, i) => `
+      <button onclick="togglePrayer(${i});renderNamozPage()" style="flex:1;min-width:60px;padding:10px 4px;border:2px solid ${todayArr[i]?'var(--emerald)':'var(--border)'};border-radius:12px;background:${todayArr[i]?'var(--emerald)':'var(--card)'};color:${todayArr[i]?'#fff':'var(--muted)'};font-family:var(--ui);font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <span style="font-size:16px">${todayArr[i]?'✅':'⬜'}</span>
+        ${n.slice(0,3)}
+      </button>`).join('');
+  }
+  // Rakatlar jadvali
+  const listEl = document.getElementById('namozRakatList');
+  if (listEl) {
+    listEl.innerHTML = NAMOZ_RAKATLAR.map(n => `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="width:44px;height:44px;border-radius:12px;background:${n.color};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span style="font-family:var(--arabic);font-size:15px;color:#fff">${n.arabicName}</span>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:4px">${n.name}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="font-size:10px;background:rgba(11,94,53,0.1);color:var(--emerald);padding:2px 7px;border-radius:6px;font-weight:600">Farz: ${n.farz}</span>
+            ${n.sunnat ? `<span style="font-size:10px;background:rgba(200,145,58,0.12);color:var(--gold);padding:2px 7px;border-radius:6px;font-weight:600">Sunnat: ${n.sunnat}</span>` : ''}
+            ${n.nafl ? `<span style="font-size:10px;background:var(--bg2);color:var(--muted);padding:2px 7px;border-radius:6px;font-weight:600">Nafl: ${n.nafl}</span>` : ''}
+            ${n.vitr ? `<span style="font-size:10px;background:rgba(29,154,90,0.15);color:var(--emerald-m);padding:2px 7px;border-radius:6px;font-weight:600">Vitr: ${n.vitr}</span>` : ''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:var(--serif);font-size:22px;color:var(--emerald);font-weight:700">${n.total}</div>
+          <div style="font-size:10px;color:var(--muted)">rakat</div>
+        </div>
+      </div>`).join('');
+  }
+  // Haftalik grafik
+  const chartEl = document.getElementById('namozWeekChart');
+  const labelEl = document.getElementById('namozWeekLabels');
+  if (chartEl && labelEl) {
+    const pjData = getPJData();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const arr = pjData[d.toDateString()] || [];
+      const count = arr.filter(Boolean).length;
+      days.push({ label: ['Ya','Du','Se','Ch','Pa','Ju','Sh'][d.getDay()], count, isToday: i===0 });
+    }
+    chartEl.innerHTML = days.map(d => {
+      const h = Math.max(4, Math.round((d.count/6)*56));
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px">
+        <div style="font-size:9px;color:var(--muted)">${d.count||''}</div>
+        <div style="width:100%;height:${h}px;background:${d.isToday?'var(--emerald)':'var(--emerald-l)'};border-radius:4px 4px 0 0;opacity:${d.isToday?1:0.5}"></div>
+      </div>`;
+    }).join('');
+    labelEl.innerHTML = days.map(d => `<div style="flex:1;text-align:center;font-size:9px;font-weight:${d.isToday?700:400};color:${d.isToday?'var(--emerald)':'var(--muted)'}">${d.label}</div>`).join('');
+  }
+}
+
+// ===== ZAKAT KALKULYATORI =====
+function calcZakat() {
+  const naqd = parseFloat(document.getElementById('zakatNaqd')?.value || '0') || 0;
+  const oltin = parseFloat(document.getElementById('zakatOltin')?.value || '0') || 0;
+  const kumush = parseFloat(document.getElementById('zakatKumush')?.value || '0') || 0;
+  const oltinNarx = parseFloat(document.getElementById('zakatOltinNarx')?.value || '0') || 900000;
+
+  // Jami qiymat (so'mda)
+  const oltinQiymat = oltin * oltinNarx;
+  const kumushQiymat = kumush * (oltinNarx / 85 * 595 / 7); // taxminiy nisbat
+  const jami = naqd + oltinQiymat + kumushQiymat;
+
+  // Nisob (85g oltin qiymati)
+  const nisob = 85 * oltinNarx;
+
+  const resultEl = document.getElementById('zakatResult');
+  const emptyEl = document.getElementById('zakatResultEmpty');
+  const amountEl = document.getElementById('zakatAmount');
+  const statusEl = document.getElementById('zakatStatus');
+
+  if (jami <= 0) {
+    if (resultEl) resultEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+
+  if (resultEl) resultEl.style.display = 'block';
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  const zakatMiqdori = jami * 0.025;
+  if (amountEl) amountEl.textContent = Math.round(zakatMiqdori).toLocaleString('uz-UZ') + " so'm";
+
+  if (jami >= nisob) {
+    if (resultEl) resultEl.style.background = 'var(--emerald)';
+    if (statusEl) statusEl.textContent = `✅ Nisob ${Math.round(nisob).toLocaleString()} so'm — Zakat farz`;
+  } else {
+    if (resultEl) resultEl.style.background = 'var(--muted)';
+    if (statusEl) statusEl.textContent = `⚠️ Nisob ${Math.round(nisob).toLocaleString()} so'm — Zakat farz emas`;
+  }
+
+  // localStorage ga saqlash (hisob ma'lumotlari)
+  try {
+    localStorage.setItem('zakat_last_calc', JSON.stringify({
+      naqd, oltin, kumush, oltinNarx, jami, zakatMiqdori, nisob,
+      farz: jami >= nisob, t: Date.now()
+    }));
+  } catch(e) {}
+}
+
+function saveZakat() {
+  const lastCalc = JSON.parse(localStorage.getItem('zakat_last_calc') || 'null');
+  if (!lastCalc || lastCalc.jami <= 0) { showToast('Avval hisoblang'); return; }
+  try {
+    let history = JSON.parse(localStorage.getItem('zakat_history') || '[]');
+    history.unshift(lastCalc);
+    history = history.slice(0, 10); // Oxirgi 10 ta
+    localStorage.setItem('zakat_history', JSON.stringify(history));
+    showToast('✅ Zakat tarixi saqlandi');
+    renderZakatHistory();
+  } catch(e) {}
+}
+
+function renderZakatHistory() {
+  const el = document.getElementById('zakatHistory');
+  if (!el) return;
+  try {
+    const history = JSON.parse(localStorage.getItem('zakat_history') || '[]');
+    if (!history.length) {
+      el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Hali zakat saqlanmagan</div>';
+      return;
+    }
+    el.innerHTML = history.map((h, i) => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:${h.farz?'var(--emerald)':'var(--bg2)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">${h.farz?'✅':'⚠️'}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:13px;color:var(--text)">${Math.round(h.zakatMiqdori).toLocaleString()} so'm</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Jami: ${Math.round(h.jami).toLocaleString()} · ${new Date(h.t).toLocaleDateString('uz-UZ',{day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>
+        <button onclick="delZakatHistory(${i})" style="background:none;border:none;color:var(--light);cursor:pointer;font-size:16px;padding:2px">✕</button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function delZakatHistory(idx) {
+  try {
+    let history = JSON.parse(localStorage.getItem('zakat_history') || '[]');
+    history.splice(idx, 1);
+    localStorage.setItem('zakat_history', JSON.stringify(history));
+    renderZakatHistory();
+    showToast("O'chirildi");
+  } catch(e) {}
 }
 
 
